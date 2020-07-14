@@ -1,0 +1,68 @@
+---
+title: "reading/writing files lab"
+output: html_notebook
+---
+```{r}
+library(readr)
+library(readxl)
+library(openxlsx)
+```
+
+```{r}
+user_for_x <- read_tsv("data/uber-for-x.txt")
+user_for_x
+```
+```{r}
+female_names <- read_lines("data/female_names.txt")
+female_names
+```
+```{r}
+edinburgh_trees <- read_csv("data/edinburgh-trees.csv", skip = 8)
+edinburgh_trees
+```
+```{r}
+populism <- readxl::read_xlsx("data/populism.xlsx")
+populism
+```
+```{r}
+populism_split <- split(populism, populism$region)
+populism_split
+```
+```{r}
+write.xlsx(populism_split, file = "populism_split.xlsx")
+write.xlsx(populism, file = "populism.xlsx")
+```
+
+```{r}
+library(jsonlite)
+```
+```{r}
+starwars_raw <- read_file("data/starwars.json")
+```
+```{r}
+prettify(starwars_raw)
+starwars_list <- parse_json(starwars_raw)
+```
+```{r}
+starwars_df <- fromJSON(starwars_raw)
+starwars_df
+```
+```{r}
+read_xlsx("populism_split.xlsx")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

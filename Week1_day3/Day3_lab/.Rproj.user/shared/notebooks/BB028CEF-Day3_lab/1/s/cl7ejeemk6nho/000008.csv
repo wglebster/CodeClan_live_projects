@@ -1,0 +1,7 @@
+"0","five_day_forecast <- data.frame("
+"0","  day_of_week = days_of_week,"
+"0","  temp = temperature, "
+"0","  chance_of_rain = chance_of_rain,"
+"0","  cloud_cover = cloud_cover"
+"0",")"
+"0","five_day_forecast"

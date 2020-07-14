@@ -1,0 +1,2 @@
+"0","#print first few top rows "
+"0","head(all_deaths, 3)"

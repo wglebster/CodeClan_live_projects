@@ -1,0 +1,30 @@
+"0","refunds <- read_csv(""02_dealing_with_outliers/data/refunds_info_sample.csv"")"
+"2","Parsed with column specification:
+cols(
+  deputy_name = [31mcol_character()[39m,
+  deputy_state = [31mcol_character()[39m,
+  political_party = [31mcol_character()[39m,
+  refund_description = [31mcol_character()[39m,
+  company_name = [31mcol_character()[39m,
+  company_id = [32mcol_double()[39m,
+  refund_date = [34mcol_datetime(format = """")[39m,
+  refund_value = [32mcol_double()[39m,
+  tax_rebate = [32mcol_double()[39m,
+  party_pg = [31mcol_character()[39m,
+  party_en = [31mcol_character()[39m,
+  party_tse = [32mcol_double()[39m,
+  party_regdate = [31mcol_character()[39m,
+  party_nmembers = [32mcol_double()[39m,
+  party_ideology1 = [31mcol_character()[39m,
+  party_ideology2 = [31mcol_character()[39m,
+  party_ideology3 = [31mcol_character()[39m,
+  party_ideology4 = [33mcol_logical()[39m,
+  party_position = [31mcol_character()[39m
+)
+"
+"0","dim(refunds)"
+"1","[1]"
+"1"," 20262"
+"1","    19"
+"1","
+"

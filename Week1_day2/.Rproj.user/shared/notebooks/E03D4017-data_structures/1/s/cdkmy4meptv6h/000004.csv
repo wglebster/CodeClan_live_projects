@@ -1,0 +1,2 @@
+"0","exam_results <- data.frame(student, question_1, question_2, question_3)"
+"0","rm(exam)"

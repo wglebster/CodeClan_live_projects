@@ -1,0 +1,2 @@
+"0","not_lan_fem <- filter(all_deaths, !allegiances %in% c(""Lannister"", ""House Lannister""), gender == 0)"
+"0","not_lan_fem"

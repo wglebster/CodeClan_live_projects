@@ -1,0 +1,9 @@
+"0","SELECT
+  employees.first_name,
+  employees.last_name,
+  teams.name,
+  teams.charge_cost
+FROM employees INNER JOIN teams 
+ON employees.team_id = teams.id
+WHERE CAST(teams.charge_cost AS INT) > 80
+ORDER BY UPPER(employees.last_name) ASC NULLS LAST"

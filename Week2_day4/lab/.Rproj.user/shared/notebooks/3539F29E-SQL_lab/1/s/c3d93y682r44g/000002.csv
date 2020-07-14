@@ -1,0 +1,7 @@
+"0","```sql
+SELECT
+  pension_enrol,
+  COUNT(id) AS pension_enrol_count
+FROM employees
+GROUP BY pension_enrol;
+```"

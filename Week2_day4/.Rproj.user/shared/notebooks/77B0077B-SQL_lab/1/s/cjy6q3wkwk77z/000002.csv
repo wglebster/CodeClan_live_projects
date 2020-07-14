@@ -1,0 +1,6 @@
+"0","```sql
+SELECT 
+  COUNT(id) count_of_missing_local_account_details
+FROM pay_details
+WHERE local_account_no IS NULL;
+```"

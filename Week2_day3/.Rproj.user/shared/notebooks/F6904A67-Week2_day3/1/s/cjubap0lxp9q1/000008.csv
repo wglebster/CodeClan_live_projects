@@ -1,0 +1,4 @@
+"0","SELECT
+  COUNT(*) AS total_started_in_2001
+FROM employees
+WHERE EXTRACT(YEAR FROM start_date) = 2001"

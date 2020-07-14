@@ -1,0 +1,8 @@
+"0","```r
+far_weather_matrix <- (weather_matrtix * 1.8) + 32
+far_weather_matrix
+```"
+"1","        Thu  Fri  Sat  Sun  Mon  Tue  Wed
+week_1 62.6 62.6 59.0 62.6 64.4 66.2 64.4
+week_2 60.8 60.8 60.8 64.4 64.4 66.2 66.2
+"

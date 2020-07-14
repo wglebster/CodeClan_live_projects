@@ -1,0 +1,327 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(RPostgreSQL)
+```
+
+```{r}
+home_location <- Sys.getenv("HOME")
+credentials_location <- paste0(home_location,"/credentials.R")
+source(credentials_location)
+```
+
+```{r}
+db_connect <- dbConnect(drv = PostgreSQL(), user = postgresql_username, password = postgresql_password, dbname = "omni_employees", host = "localhost")
+rm(postgresql_username, postgresql_password)
+```
+SQL Database querying in R
+```{r}
+#get full dataframe
+dbGetQuery(conn = db_connect, statement = 
+             "SELECT * FROM employees;")
+```
+```{sql connection=db_connect}
+--SQL comment
+SELECT * FROM employees;
+```
+select team_id 1
+```{sql connection=db_connect}
+SELECT * FROM employees WHERE team_id = 1;
+```
+working 0.5 fre or more
+```{sql connection=db_connect}
+SELECT * FROM employees WHERE fte_hours >= 0.5;
+```
+all employees not based in Brazil
+```{sql connection=db_connect}
+SELECT * FROM employees WHERE country != 'Brazil';
+```
+find all employees in China that started working in 2019
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE country = 'China' AND start_date >= '2019-01-01';
+```
+
+find all employees in China that started working after 2019 or are enrolled in pension
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE country = 'China' AND (start_date >= '2019-01-01' OR pension_enrol = TRUE);
+```
+find all employees working between 0.25 and 0.5 fte hours inclusive
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE fte_hours >= 0.25 AND fte_hours <= 0.5;
+```
+
+find employees that started working in years other than 2017
+
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE start_date <= '2017-01-01' OR start_date >= '2017-12-31';
+```
+
+find all employees working between 0.25 and 0.5 fte hours inclusive USING BETWEEN.
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE fte_hours BETWEEN 0.25 AND 0.5;
+```
+
+find employees that started working in years other than 2017 using BETWEEN
+
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE start_date NOT BETWEEN '2017-01-01' AND '2017-12-31';
+```
+
+find employees that started working in 2016 and work 0.5 fte or more
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE (start_date BETWEEN '2016-01-01' AND '2016-12-31') AND (fte_hours >= 0.5);
+```
+
+find all employees in Spain, South Africa, Ireland and Germany.
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE country IN('Spain', 'South Africa', 'Ireland', 'Germany');
+```
+
+NOT IN Finland Argentina Canada
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE country NOT IN('Finland', 'Argentina', 'Canada');
+```
+find all whos last name begins with 'Mc..'
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE country = 'Greece' AND last_name LIKE 'Mc%'
+-- % is a wildcard
+
+```
+find all with no email
+```{sql connection=db_connect}
+SELECT * FROM employees
+WHERE email IS NULL
+```
+
+selecting specific columns only
+```{sql connection=db_connect}
+SELECT id, first_name, last_name FROM employees
+WHERE department = 'Accounting'
+```
+
+first and last names combined in one column
+```{sql connection=db_connect}
+SELECT 
+  id,
+  first_name,
+  last_name,
+  CONCAT(first_name, ' ', last_name) AS full_name
+FROM employees
+```
+
+filter rows that don't have both first and last name
+```{sql connection=db_connect}
+SELECT 
+  id,
+  first_name,
+  last_name,
+  CONCAT(first_name, ' ', last_name) AS full_name 
+FROM employees
+WHERE first_name IS NULL OR last_name IS NULL;
+```
+
+# DISTINCT values
+
+```{sql connection=db_connect}
+SELECT 
+DISTINCT(department)
+FROM employees
+```
+
+# AGGREGATE functions
+
+How many STARTED  WORKING in 2001
+```{sql connection=db_connect}
+SELECT
+  COUNT(*) AS total_started_in_2001
+FROM employees
+WHERE EXTRACT(YEAR FROM start_date) = 2001
+```
+
+Maximum and minimum salaries of all employees?
+```{sql connection=db_connect}
+SELECT
+  MIN(salary) AS min_salary,
+  MAX(salary) AS max_salary
+FROM employees
+```
+
+Average salary of employees in the Human Resources.
+```{sql connection=db_connect}
+SELECT
+  AVG(salary) AS avg_HR_salary
+FROM employees
+WHERE department = 'Human Resources'
+
+```
+
+How much does the corporation spend on the salaries of employees hired in 2018
+```{sql connection=db_connect}
+SELECT 
+  SUM(salary) AS total_spend_on_salaries
+FROM employees
+WHERE EXTRACT(YEAR FROM start_date) = 2018
+
+```
+
+# Order. 
+
+```{sql connection=db_connect}
+SELECT *
+FROM employees
+WHERE salary IS NOT NULL
+ORDER BY salary DESC
+LIMIT 1
+```
+
+```{sql connection=db_connect}
+```
+
+
+```{sql connection=db_connect}
+SELECT * 
+FROM employees
+ORDER BY salary ASC NULLS LAST 
+LIMIT 1
+```
+
+longest serving employee
+```{sql connection=db_connect}
+SELECT *
+FROM employees
+ORDER BY start_date ASC NULLS LAST 
+LIMIT 1
+```
+
+Highest paid employee in Libya
+```{sql connection=db_connect}
+SELECT * 
+FROM employees
+WHERE country = 'Libya'
+ORDER BY salary DESC NULLS LAST
+LIMIT 1
+```
+most commom fte across the corp, based in America.
+```{sql connection=db_connect}
+SELECT 
+  fte_hours,
+  COUNT(id) AS total
+FROM employees 
+WHERE fte_hours IS NOT NULL AND country = 'United States'
+GROUP BY fte_hours 
+ORDER BY COUNT(fte_hours) DESC
+-- LIMIT 1
+```
+
+NUMBER of employees within each department
+```{sql connection=db_connect}
+SELECT
+  department,
+  COUNT(id) AS number_of_employees
+FROM employees
+GROUP BY department
+```
+
+how many employees in each country
+```{sql connection=db_connect}
+SELECT 
+  country,
+  COUNT(id) AS num_employees
+FROM employees
+GROUP BY country
+```
+how many in each department work either 0.25 or 0.5 fte
+
+```{sql connection=db_connect}
+SELECT 
+  department,
+  COUNT(id) AS num_of_employees
+FROM employees
+WHERE fte_hours BETWEEN 0.25 AND 0.5 -- could do IN(0.25, 0.5) instead of BETWEEN
+GROUP BY department
+```
+
+how many employees in each dept are enrolled in pension
+```{sql connection=db_connect}
+SELECT
+  department,
+  COUNT(id) AS num_employees
+FROM employees
+WHERE pension_enrol IS TRUE
+GROUP BY department
+```
+breakdown employees by country where first name is NULL
+```{sql connection=db_connect}
+SELECT 
+  country,
+  COUNT(id) AS num_employees
+FROM employees
+WHERE first_name IS NULL
+GROUP BY country
+```
+
+depts where at lest 40 employees work either 0.25 or 0.5 fte
+
+```{sql connection=db_connect}
+SELECT 
+  department,
+  COUNT(id) AS num_of_employees
+FROM employees
+WHERE fte_hours IN(0.25, 0.5)
+GROUP BY department
+HAVING COUNT(id) >= 40
+
+```
+```{sql connection=db_connect}
+SELECT
+  country,
+  MIN(salary) ASmin_salary
+FROM employees
+WHERE pension_enrol IS TRUE
+GROUP BY country
+HAVING MIN(salary) < 21000
+```
+# SUBQUERIES
+
+Japan employees earning over company wide average salary
+
+```{sql connection=db_connect}
+SELECT *
+FROM employees
+WHERE country = 'Japan' AND salary > (SELECT AVG(salary) FROM employees)
+```
+
+depts where at lest 40 employees work either 0.25 or 0.5 fte as subquery
+```{sql connection=db_connect}
+SELECT *
+FROM employees
+WHERE country = 'United States' AND fte_hours =
+  (SELECT fte_hours
+   FROM employees
+   WHERE fte_hours IS NOT NULL
+   GROUP BY fte_hours
+   ORDER BY COUNT(fte_hours) DESC
+   LIMIT 1
+  )
+
+```
+
+
+```{r}
+#disconnect from database in the end
+dbDisconnect(db_connect)
+```
+
+

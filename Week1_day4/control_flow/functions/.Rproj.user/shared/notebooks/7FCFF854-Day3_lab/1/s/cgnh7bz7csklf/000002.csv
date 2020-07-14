@@ -1,0 +1,12 @@
+"0","```r
+avg_temp <- mean(temperature)
+avg_temp
+```"
+"1","[1] 14
+"
+"0","```r
+avg_rain <- mean(chance_of_rain)
+avg_rain
+```"
+"1","[1] 39
+"

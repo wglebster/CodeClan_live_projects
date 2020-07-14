@@ -1,0 +1,27 @@
+"0","#overview of data"
+"0","glimpse(all_deaths)"
+"1","Rows: 917"
+"1",""
+"1","
+"
+"1","Columns: 13"
+"1",""
+"1","
+"
+"1","$ name               [3m[38;5;246m<chr>[39m[23m ""Addam Marbrand"", ""Aegon Frey (Jinglebell)"",…
+$ allegiances        [3m[38;5;246m<chr>[39m[23m ""Lannister"", ""None"", ""House Targaryen"", ""Hou…
+$ year_of_death      [3m[38;5;246m<dbl>[39m[23m NA, 299, NA, 300, NA, NA, 300, 300, NA, NA, …
+$ book_of_death      [3m[38;5;246m<dbl>[39m[23m NA, 3, NA, 5, NA, NA, 4, 5, NA, NA, 2, NA, 5…
+$ death_chapter      [3m[38;5;246m<dbl>[39m[23m NA, 51, NA, 20, NA, NA, 35, NA, NA, NA, 56, …
+$ book_intro_chapter [3m[38;5;246m<dbl>[39m[23m 56, 49, 5, 20, NA, NA, 21, 59, 11, 0, 50, 54…
+$ gender             [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,…
+$ nobility           [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1,…
+$ book1_GoT          [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1,…
+$ book2_CoK          [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0,…
+$ book3_SoS          [3m[38;5;246m<dbl>[39m[23m 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0,…
+$ book4_FfC          [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1,…
+$ book5_DwD          [3m[38;5;246m<dbl>[39m[23m 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0,…"
+"1",""
+"1","
+"
+"0","view(all_deaths)"

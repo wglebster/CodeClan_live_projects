@@ -1,0 +1,6 @@
+"0","name <- c(""John"", ""Clara"", ""Smith"")"
+"0","sex <- c(1, 2, 1)"
+"0","age <- c(30, 32, 54)"
+"0","# create a new dataframe"
+"0","student_df <- data.frame(name, sex, age)"
+"0","student_df"

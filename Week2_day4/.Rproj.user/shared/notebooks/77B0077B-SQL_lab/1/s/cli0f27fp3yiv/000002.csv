@@ -1,0 +1,6 @@
+"0","```sql
+SELECT
+ COUNT(id) AS num_employees_in_portugal
+FROM employees
+WHERE country = 'Portugal';
+```"

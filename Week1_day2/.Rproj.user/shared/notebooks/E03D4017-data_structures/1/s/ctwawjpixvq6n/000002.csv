@@ -1,0 +1,2 @@
+"0","exam_results$total <- exam_results$question_1 + exam_results$question_2 + exam_results$question_3"
+"0","exam_results"

@@ -1,0 +1,4 @@
+"0","```r
+plot(years, mean_annual, main = \"Mean temperature\",
+     ylab = \"Mean temp in degrees C\")
+```"

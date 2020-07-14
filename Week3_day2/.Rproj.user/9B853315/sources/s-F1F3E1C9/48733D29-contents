@@ -1,0 +1,292 @@
+---
+title: "Cleaning data"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+# Preliminary data checks 
+```{r}
+video_games <- read_csv("01_cleaning_data/data/steam-200k-sample.csv", skip = 4)
+head(video_games, 5)
+```
+
+```{r}
+video_games <- read_csv("01_cleaning_data/data/steam-200k-sample.csv", skip = 4,
+                        col_types = cols("bought online" = col_logical()))
+head(video_games)
+```
+
+```{r}
+names(video_games)
+```
+```{r}
+#install.packages("janitor")
+library(janitor)
+```
+
+```{r}
+video_games_clean <- clean_names(video_games)
+head(video_games_clean)
+```
+
+```{r}
+#video_games_clean
+unique(video_games_clean$game_name)
+```
+```{r}
+video_games_upcase <- mutate_all(video_games_clean, 
+                                 .funs = toupper)
+video_games_upcase
+```
+```{r}
+video_games_upcase %>%
+  select(-what)
+```
+-----
+
+# Dealing with Outliers
+
+```{r}
+iris
+```
+boxplot
+```{r}
+iris_variables <- iris %>%
+  select(-Species)
+
+boxplot(iris_variables)
+```
+```{r}
+boxplot(iris_variables$Sepal.Width)
+```
+## Outliers can be kept or dropped
+```{r}
+refunds <- read_csv("02_dealing_with_outliers/data/refunds_info_sample.csv")
+dim(refunds)
+```
+```{r}
+names(refunds)
+
+head(refunds)
+```
+```{r}
+boxplot(refunds$refund_value)
+```
+### ggplot :)
+```{r}
+ggplot(refunds) + 
+  aes(x = refund_description, y = refund_value) +
+  geom_boxplot()+
+  coord_flip()
+
+```
+```{r}
+#to get z scores
+#install.packages("outliers")
+library(outliers)
+```
+
+```{r}
+#get z scores for refunds column
+refunds_zscore <- scores(refunds$refund_value)
+```
+
+```{r}
+#get a logical vector where z score is greater than 3 or less than -3
+is_outlier <- refunds_zscore > 3 | refunds_zscore < -3
+```
+
+```{r}
+#put outlier into data
+
+refunds <- refunds %>%
+  mutate(outliers = is_outlier)
+head(refunds)
+```
+
+```{r}
+refunds_outliers <- refunds %>%
+  filter(outliers == TRUE)
+```
+```{r}
+ggplot(refunds_outliers) +
+  aes(x = refund_description, y = refund_value) +
+  geom_boxplot() + 
+  coord_flip()
+```
+### drop all outliers from the dataset
+
+```{r}
+refunds_outliers <- refunds %>%
+  filter(outliers == FALSE)
+```
+```{r}
+ggplot(refunds_outliers) +
+  aes(x = refund_description, y = refund_value) +
+  geom_boxplot() + 
+  coord_flip()
+```
+-----
+
+
+# Missing Values 
+- remove
+- leave as is
+- fill in 
+```{r}
+comms_data <- read_csv("03_dealing_with_missing_values/data/telecom_data.csv")
+```
+```{r}
+view(comms_data)
+```
+Standard missing values
+
+```{r}
+comms_data %>% 
+  filter(is.na(monthly_charges))
+
+dim(comms_data)
+```
+----- Remove missing data
+```{r}
+comms_data %>% 
+  drop_na(monthly_charges)
+```
+
+---- Impute missing data (with median or mean)
+```{r}
+comms_data_median <- comms_data %>%
+  mutate(monthly_charges = 
+           replace(monthly_charges, 
+                   is.na(monthly_charges),
+                   median(monthly_charges, na.rm = TRUE)
+                   #median(monthly_charges, na.rm = TRUE)
+                   )
+         )
+
+comms_data_median
+```
+```{r}
+ggplot(comms_data_median, aes(customerID, monthly_charges)) + geom_point()
+```
+```{r}
+comms_data_median
+```
+
+--- change column type
+```{r}
+charges_numeric_imp <- charges_numeric %>% 
+  mutate(total_charges = 
+           replace(total_charges, 
+                   is.na(total_charges),
+                   median(total_charges, na.rm = TRUE)
+                   #median(monthly_charges, na.rm = TRUE)
+                   )
+         )
+  
+
+charges_numeric_imp
+  
+```
+```{r}
+unique(charges_numeric_imp$payment_method)
+```
+```{r}
+payments_new <- charges_numeric_imp %>% 
+  mutate(payment_method = 
+           replace(payment_method, is.na(payment_method), 
+                   "unavailable")
+         ) %>%
+  mutate(payment_method = 
+           replace(payment_method, payment_method == "--", 
+                   "unavailable")
+         )
+view(payments_new)
+```
+
+# Joins
+
+```{r}
+customers <- tibble(
+  customer_ID = c(001, 002, 004, 005, 008, 010), 
+  name = c("John Smith", "Jane Adams", "Robert Landry", "Jane Tow", "Raul Tann", "Hilary Joyal"),
+  email_address = c("johnsmith@gmail.com", "janea@gmail.com", "rlabdry@hotmail.com", "janet89@aol.com", "paul.tann1@gmail.com", NA),
+  shipping_address = c("32 Station Road, Edinburgh", "42 Park Drive, Edinburgh", NA, "10 Gardiner Rd, Edinburgh", "12 Main St, Edinburgh", " 234 Queensferry Rd, Edinburgh,")
+)
+customers
+
+```
+```{r}
+customers_adjusted <- rename(customers, identifier = customer_ID)
+customers_adjusted
+```
+
+```{r}
+orders <- tibble(
+  customer_ID = c(001, 002, 005, 010, 012, 001), 
+  order_number = c("KU65781", "SU98201", "JS76821", "YR28212", "JS91221","YR21873"),
+  order_total = c("£32.50", "£56.00", "£100.02", "£20.25", "£39.50", "£45.00"),
+  product_code = c("XZY780", "XYZ123", "XYZ256", "XYZ262", "XYZ345", "XYZ127")
+)
+orders
+```
+## Inner JOIN
+
+```{r}
+inner_join(customers_adjusted, orders, by = c("identifier" = "customer_ID"))
+```
+
+```{r}
+inner_join(customers, orders, by = "customer_ID")
+```
+## Left JOIN
+```{r}
+left_join(customers, orders, by = "customer_ID")
+```
+## Right JOIN - same as left, just rigt
+
+## Full JOIN
+It produces a table with all the rows.
+
+## Semi JOIN
+```{r}
+semi_join(customers, orders, by = "customer_ID")
+```
+## Anti JOIN
+
+```{r}
+anti_join(customers, orders, by = "customer_ID")
+```
+
+# Binding
+
+```{r}
+statuses <- tibble(
+  status = as.factor(c("active", "active", "inactive", "inactive", "active", "inactive"))
+)
+statuses
+```
+```{r}
+bind_cols(customers, statuses)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

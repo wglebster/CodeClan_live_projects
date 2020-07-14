@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1594290927523.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1567424382",
+    "id" : "59824878",
+    "lastKnownWriteTime" : 1594304957,
+    "last_content_update" : 1594304957687,
+    "path" : "~/Desktop/CodeClan/Codeclan_work/Live_Projects/Week2_day4/Week2_day4.Rmd",
+    "project_path" : "Week2_day4.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "110,10",
+        "scrollLine" : "102",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

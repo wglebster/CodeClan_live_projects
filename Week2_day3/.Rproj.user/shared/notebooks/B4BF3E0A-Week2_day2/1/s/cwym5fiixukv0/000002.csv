@@ -1,0 +1,6 @@
+"0","```r
+# this closes db connection 
+dbDisconnect(conn = my_db_connection)
+```"
+"1","[1] TRUE
+"

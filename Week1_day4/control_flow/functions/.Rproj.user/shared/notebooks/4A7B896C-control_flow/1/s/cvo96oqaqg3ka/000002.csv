@@ -1,0 +1,10 @@
+"0","```r
+x <- 10
+if (x %% 2 ==0) {
+  print(\"It is an even number\")
+} else {
+  print(\"It is an odd number\")
+}
+```"
+"1","[1] \"It is an even number\"
+"

@@ -1,0 +1,5 @@
+"0","SELECT 
+  SUM(salary) AS total_spend_on_salaries
+FROM employees
+WHERE EXTRACT (YEAR FROM start_date) = 2018
+"

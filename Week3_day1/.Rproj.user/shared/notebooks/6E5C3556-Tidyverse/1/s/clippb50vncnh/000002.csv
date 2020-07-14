@@ -1,0 +1,3 @@
+"0","#select all colums starting with ""book"""
+"0","books <- select(all_deaths, starts_with(""book""))"
+"0","books"

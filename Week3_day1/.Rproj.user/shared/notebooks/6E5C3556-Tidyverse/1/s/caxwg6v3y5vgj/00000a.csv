@@ -1,0 +1,4 @@
+"0","rename_index_col <- data_frame1 %>%"
+"0","  rename(first_letter = Index)"
+"0",""
+"0","rename_index_col"

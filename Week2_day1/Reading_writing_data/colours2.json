@@ -1,0 +1,26 @@
+{
+  "blue": {
+    "name": "Blue",
+    "feelings": ["Sad", "Calm"],
+    "primary": "Yes",
+    "wavelength": 470
+  },
+  "red": {
+    "name": "Red",
+    "feelings": ["Angry", "Energetic", "Warm"],
+    "primary": "Yes",
+    "wavelength": 665
+  },
+  "green": {
+    "name": "Green",
+    "feelings": ["Calm", "Nature"],
+    "primary": "No",
+    "wavelength": 550
+  },
+  "yellow": {
+    "name": "Yellow",
+    "feelings": ["Happy", "Warm", "Sunny"],
+    "primary": "Yes",
+    "wavelength": 600
+  }
+}

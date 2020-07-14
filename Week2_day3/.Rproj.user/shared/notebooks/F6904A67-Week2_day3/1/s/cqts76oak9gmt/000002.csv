@@ -1,0 +1,7 @@
+"0","SELECT
+  country,
+  MIN(salary) ASmin_salary
+FROM employees
+WHERE pension_enrol IS TRUE
+GROUP BY country
+HAVING MIN(salary) < 21000"

@@ -1,0 +1,3 @@
+"0","video_games <- read_csv(""01_cleaning_data/data/steam-200k-sample.csv"", skip = 4,"
+"0","                        col_types = cols(""bought online"" = col_logical()))"
+"0","head(video_games)"

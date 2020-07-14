@@ -1,0 +1,15 @@
+"0","```r
+x <- 1:20
+case_when(
+  x %% 2 == 0 ~ \"Even\",
+  x %% 2 == 0 ~ \"Divisible by 3\",
+  x %% 5 == 0 ~ \"Divisible by 5\",
+  TRUE ~ \"Other Number\"
+)
+```"
+"1"," [1] \"Other Number\"   \"Even\"           \"Other Number\"   \"Even\"          
+ [5] \"Divisible by 5\" \"Even\"           \"Other Number\"   \"Even\"          
+ [9] \"Other Number\"   \"Even\"           \"Other Number\"   \"Even\"          
+[13] \"Other Number\"   \"Even\"           \"Divisible by 5\" \"Even\"          
+[17] \"Other Number\"   \"Even\"           \"Other Number\"   \"Even\"          
+"

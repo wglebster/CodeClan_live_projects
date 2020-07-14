@@ -1,0 +1,22 @@
+"0","```r
+#my version
+encoded <- c(23, 18, 9, 20, 9, 14, 7, 27, 18, 27, 3, 15, 4, 5, 27, 9, 19, 27, 6, 21, 14)
+letters[encoded]
+```"
+"1"," [1] \"w\" \"r\" \"i\" \"t\" \"i\" \"n\" \"g\" NA  \"r\" NA  \"c\" \"o\" \"d\" \"e\" NA  \"i\" \"s\" NA  \"f\" \"u\"
+[21] \"n\"
+"
+"0","```r
+#better version
+alphabet <- c(letters, \"\")
+alphabet[encoded]
+```"
+"1"," [1] \"w\" \"r\" \"i\" \"t\" \"i\" \"n\" \"g\" \"\"  \"r\" \"\"  \"c\" \"o\" \"d\" \"e\" \"\"  \"i\" \"s\" \"\"  \"f\" \"u\"
+[21] \"n\"
+"
+"0","```r
+#even better
+paste(alphabet[encoded], collapse = \" \")
+```"
+"1","[1] \"w r i t i n g  r  c o d e  i s  f u n\"
+"

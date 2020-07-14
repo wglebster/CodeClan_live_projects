@@ -1,0 +1,3 @@
+"0","SELECT * 
+  FROM animals 
+  LEFT JOIN diets ON animals.diet_id = diets.id"

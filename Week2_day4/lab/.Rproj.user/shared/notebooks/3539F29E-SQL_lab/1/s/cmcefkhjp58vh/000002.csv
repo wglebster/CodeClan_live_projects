@@ -1,0 +1,9 @@
+"0","```sql
+SELECT 
+  department,
+  COUNT(id) AS number_of_employees
+FROM employees
+WHERE EXTRACT(YEAR FROM start_date) = 2003
+GROUP BY department
+ORDER BY number_of_employees DESC;
+```"

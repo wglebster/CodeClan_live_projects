@@ -1,0 +1,2 @@
+"0","SELECT * FROM employees
+WHERE fte_hours BETWEEN 0.25 AND 0.5;"

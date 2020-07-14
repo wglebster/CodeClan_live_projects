@@ -1,0 +1,8 @@
+"0","SELECT 
+  EXTRACT(YEAR FROM start_date) AS start_year,
+  COUNT(EXTRACT(YEAR FROM start_date)) AS num_starts
+FROM employees
+--WHERE start_date IS NOT NULL
+GROUP BY start_year
+ORDER BY start_year DESC NULLS LAST
+"

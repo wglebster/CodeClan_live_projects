@@ -1,0 +1,10 @@
+"0","comms_data <- read_csv(""03_dealing_with_missing_values/data/telecom_data.csv"")"
+"2","Parsed with column specification:
+cols(
+  customerID = [32mcol_double()[39m,
+  monthly_charges = [32mcol_double()[39m,
+  total_charges = [31mcol_character()[39m,
+  payment_method = [31mcol_character()[39m,
+  churn = [31mcol_character()[39m
+)
+"

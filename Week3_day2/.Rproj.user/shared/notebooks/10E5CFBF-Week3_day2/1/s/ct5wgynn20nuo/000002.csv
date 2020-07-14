@@ -1,0 +1,5 @@
+"0","#put outlier into data"
+"0",""
+"0","refunds <- refunds %>%"
+"0","  mutate(outliers = is_outlier)"
+"0","head(refunds)"

@@ -1,0 +1,3 @@
+"0","#get full dataframe"
+"0","dbGetQuery(conn = db_connect, statement = "
+"0","             ""SELECT * FROM employees;"")"

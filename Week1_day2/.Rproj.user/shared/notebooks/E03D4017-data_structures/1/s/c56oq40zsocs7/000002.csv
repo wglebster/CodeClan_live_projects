@@ -1,0 +1,2 @@
+"0","age_order <- order(shoe_satisfaction$age)"
+"0","shoe_satisfaction[age_order, ]"

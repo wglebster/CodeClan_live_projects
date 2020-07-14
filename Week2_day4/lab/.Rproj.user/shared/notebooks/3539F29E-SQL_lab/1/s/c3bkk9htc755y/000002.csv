@@ -1,0 +1,9 @@
+"0","```sql
+SELECT 
+  first_name,
+  last_name,
+  country
+FROM employees
+ORDER BY country ASC, UPPER(last_name) ASC NULLS LAST;
+  
+```"

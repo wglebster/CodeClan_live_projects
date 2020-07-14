@@ -1,0 +1,2 @@
+"0","males <- filter(all_deaths, allegiances == ""None"", gender == 0)"
+"0","males"

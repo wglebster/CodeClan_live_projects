@@ -1,0 +1,6 @@
+"0","letters <- factor(c(""a"", ""a"", ""b"", ""a""), ordered = TRUE)"
+"0","letters[3] > letters[2]"
+"1","[1]"
+"1"," TRUE"
+"1","
+"

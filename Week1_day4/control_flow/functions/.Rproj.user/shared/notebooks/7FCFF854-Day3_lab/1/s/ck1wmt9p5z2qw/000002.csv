@@ -1,0 +1,11 @@
+"0","```r
+days_of_week_factor <- factor(c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"),
+                              levels = c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"),
+                              ordered = TRUE)
+fact_temps <- c(17, 16, 17, 16, 15, 16, 17)
+names(fact_temps) <- days_of_week_factor
+days_of_week_factor
+```"
+"1","[1] Mon Tue Wed Thu Fri Sat Sun
+Levels: Mon < Tue < Wed < Thu < Fri < Sat < Sun
+"

@@ -1,0 +1,12 @@
+"0","SELECT 
+  employees.first_name,
+  employees.last_name,
+  employees.email,
+  employees.start_date,
+  committees.name
+FROM employees INNER JOIN employees_committees
+  ON employees.id = employees_committees.employee_id
+INNER JOIN committees
+  ON employees_committees.committee_id = committees.id
+WHERE committees.name = 'Equality and Diversity'
+ORDER BY start_date ASC NULLS LAST"

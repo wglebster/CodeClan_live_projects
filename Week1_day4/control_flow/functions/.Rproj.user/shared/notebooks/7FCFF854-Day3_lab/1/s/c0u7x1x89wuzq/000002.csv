@@ -1,0 +1,9 @@
+"0","```r
+weather_list <- list(
+  \"Wednesday\" = list(12, 5, \"cloudy\"),
+  \"Thursday\" = list(15, 90, \"cloudy\"),
+  \"Friday\" = list(14, 20, \"cloudy\"),
+  \"Saturday\" = list(14, 50, \"partly cloudy\"),
+  \"Sunday\" = list(15, 30, \"clear\")
+)
+```"

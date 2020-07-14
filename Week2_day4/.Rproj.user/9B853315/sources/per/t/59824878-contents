@@ -1,0 +1,117 @@
+---
+title: "Week2_day4 Joining Tables in a database"
+output: html_notebook
+---
+Import SQL library
+```{r}
+library(RPostgreSQL)
+```
+Create root path and connect to credentials
+```{r}
+credentials_location <- paste0(Sys.getenv("HOME"),"/credentials.R")
+source(credentials_location)
+```
+Create DB connection
+```{r}
+db_conect <- dbConnect(drv = PostgreSQL(), user = postgresql_username, password = postgresql_password, dbname = "zoo", host = "localhost")
+rm(postgresql_username, postgresql_password, remote_omni_postgresql_password, remote_omni_postgresql_username)
+```
+Check if connetion was successful and list all tables
+```{r}
+dbListTables(conn = db_conect)
+```
+```{r}
+dbListFields(conn = db_conect, name = "animals")
+```
+```{sql connection=db_conect}
+SELECT * FROM animals
+```
+```{sql connection=db_conect}
+SELECT * FROM diets; 
+```
+```{sql connection=db_conect}
+SELECT * FROM care_schedule; 
+```
+```{sql connection=db_conect}
+SELECT * FROM keepers; 
+```
+
+# JOINS
+## Inner Join
+
+```{sql connection=db_conect}
+SELECT * FROM animals
+INNER JOIN diets ON animals.diet_id = diets.id; 
+```
+```{sql connection=db_conect}
+SELECT
+  animals.name, --will return only the name coumn from animals table
+  animals.age,
+  diets.diet_type
+  FROM animals
+INNER JOIN diets ON animals.diet_id = diets.id
+WHERE animals.age > 4; 
+```
+```{sql connection=db_conect}
+SELECT
+  diets.diet_type,
+  COUNT(animals.id)
+  FROM animals
+INNER JOIN diets ON animals.diet_id = diets.id
+GROUP BY diets.diet_type;
+```
+get all the herbivores in the zoo
+```{sql connection=db_conect}
+SELECT *
+FROM animals
+INNER JOIN diets ON animals.diet_id = diets.id
+WHERE diet_type = 'herbivore';
+```
+
+## Left Join.
+
+```{sql connection=db_conect}
+SELECT * 
+  FROM animals 
+  LEFT JOIN diets ON animals.diet_id = diets.id
+```
+
+### right join.
+```{sql connection=db_conect}
+SELECT * 
+  FROM animals 
+  RIGHT JOIN diets ON animals.diet_id = diets.id
+```
+
+# FULL OUTER Join
+```{sql connection=db_conect}
+SELECT *
+  FROM animals 
+  FULL OUTER JOIN diets ON animals.diet_id = diets.id
+```
+# Many to Many
+
+```{sql connection=db_conect}
+SELECT *
+FROM 
+  (animals AS a INNER JOIN care_schedule AS cs
+  ON a.id = cs.animal_id)
+INNER JOIN keepers AS k 
+  ON cs.keeper_id = k.id
+```
+```{sql connection=db_conect}
+SELECT *
+FROM 
+  (animals AS a INNER JOIN care_schedule AS cs
+  ON a.id = cs.animal_id)
+INNER JOIN keepers AS k 
+  ON cs.keeper_id = k.id
+WHERE a.name = 'Ernest'
+```
+### ¡In real life always check for duplicate primary IDs before making a join.
+
+
+```{r}
+#dbDisconnect(db_conect)
+```
+

@@ -1,0 +1,1 @@
+"0","mean_temp <- mean(five_day_forecast$temp)"

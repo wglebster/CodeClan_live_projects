@@ -1,0 +1,4 @@
+"0","SELECT *
+FROM employees
+ORDER BY start_date ASC 
+LIMIT 1"

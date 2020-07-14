@@ -1,0 +1,6 @@
+"0","SELECT
+  department,
+  COUNT(id) AS num_employees
+FROM employees
+WHERE pension_enrol IS TRUE
+GROUP BY department"

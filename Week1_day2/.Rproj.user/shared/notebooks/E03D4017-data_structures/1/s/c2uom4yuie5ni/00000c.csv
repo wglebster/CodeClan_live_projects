@@ -1,0 +1,6 @@
+"0","another_matrix <- data.frame("
+"0","  c1 = c(1, 2 , 3),"
+"0","  c2 = c(""A"", ""B"", ""C""),"
+"0","  stringsAsFactors = FALSE"
+"0",")"
+"0","another_matrix"

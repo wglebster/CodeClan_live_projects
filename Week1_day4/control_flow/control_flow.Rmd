@@ -1,0 +1,236 @@
+---
+title: "Control Flow"
+output: html_notebook
+---
+# If statements
+
+```{r}
+if(expression){
+  do_code_if_true
+} else {
+  do_code_if_false
+}
+```
+expression is always boolean (==, !=, <==>, %in%, |, &)
+```{r}
+if(weather == "sunny"){
+  hang_up_washing()
+}
+```
+```{r}
+if (10 < 15) {
+  print("10 is less than 15")
+}
+```
+```{r}
+if (5 %in% c(1,4,8)) {
+  print("5 is in (1,4,8)")
+}
+```
+
+```{r}
+x <- 8
+y <- 7
+
+if (x > y) {
+  print("x is greater than y")
+}
+```
+
+```{r}
+x <- 10
+if (x %% 2 ==0) {
+  print("It is an even number")
+} else {
+  print("It is an odd number")
+}
+```
+```{r}
+if (10 != 5){
+  if (3 > 1){
+    print("Hello")
+  }
+  print("Goodby")
+}
+```
+```{r}
+if (10 != 5){
+  if (2 <= 0){
+    print("Hello")
+  }
+  print("Goodby")
+}
+```
+```{r}
+x <- 10
+y <- 2
+if (x > y) {
+  print("Start of outer if block")
+  if (x %% y ==0) {
+    print("Inner if block 1")
+    if(y %in% c(1:5)) {
+      print("Inner if block 2")
+    }
+    print("End of outer if block")
+  }
+  print("Aftrer if statement")
+}
+```
+```{r}
+if (5 < 4) {
+  print("Yes")
+} else {
+    print("No")
+}
+```
+# Specific R function for if/else flow:
+ifelse(logical expression, value if true, value if false), which is a ternary operation
+```{r}
+ifelse(1:10 <= 5, "less or equal to 5", "greater than 5")
+```
+```{r}
+ifelse(1:10 %% 2 == 0, "Even", "Odd")
+```
+replacing characters
+```{r}
+chars <- c("Cat", "Monkey")
+ifelse(chars == "Monky", "Monkey", chars)
+```
+
+
+Assignment:
+
+```{r}
+
+ifelse(x %% 3 == 0, "Multiple of 3", "Not a multiple of 3")
+ifelse(x1 == "Sum", "Sun", x1)
+```
+```{r}
+library(dplyr)
+```
+#case when
+
+```{r}
+x <- 1:20
+case_when(
+  x %% 2 == 0 ~ "Even",
+  x %% 2 == 0 ~ "Divisible by 3",
+  x %% 5 == 0 ~ "Divisible by 5",
+  TRUE ~ "Other Number" #a default option
+)
+```
+```{r}
+animals <- c("Cat", "Dog", "Monkey", "Elephant", "Dog", "Snail")
+case_when(
+  animals == "Cat" ~ 4,
+  animals == "Dog" ~ 2,
+  animals == "Monkey" ~ 3,
+  animals == "Elephant" ~ 6,
+)
+```
+```{r}
+x <- 1:20
+case_when(
+  x %% 2 == 0 ~ "Even",
+  x %% 2 == 0 ~ "Divisible by 3",
+  x %% 5 == 0 ~ "Divisible by 5",
+  TRUE ~ as.character(x)
+)
+```
+#FIZZ BUZZ
+```{r}
+fizzbuzz <- 1:100 
+case_when(
+  fizzbuzz %% 3 == 0 & fizzbuzz %% 5 ==0 ~ "FizzBuzz",
+  fizzbuzz %% 3 == 0 ~ "Fizz",
+  fizzbuzz %% 5 == 0 ~ "Buzz",
+  TRUE ~ as.character(fizzbuzz)
+)
+```
+#recode() function
+```{r}
+x <- as.factor(c("green", "blue", "blue", "red", "purple"))
+
+ifelse(x == "green", "blue", x)
+recode(x, "green" = "blue")
+```
+```{r}
+name <- c("John", "Clara", "Smith")
+sex <- c(1, 2, 1)
+age <- c(30, 32, 54)
+# create a new dataframe
+student_df <- data.frame(name, sex, age)
+student_df
+student_df$sex<-recode(sex, "1" = "male", "2" = "female" )
+student_df
+```
+```{r}
+x <- 1:10
+recode(x, "2" = 20L, "4" = 40L)
+```
+
+# Loops
+
+For loop
+```{r}
+for (variable in vector) {
+  run_some_code
+}
+```
+```{r}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+for (day in weekdays) {
+  # day is the loop index variable
+  phrase <- paste("The day is", day)
+  print(phrase)
+}
+
+```
+
+```{r}
+nums <- 1:5
+for (num in nums) {
+  pr <- paste0("paste(", num,")")
+  print(pr)
+  
+}
+```
+# While loop
+```{r}
+curr_val <- 1
+stop_val <- 10
+
+while(curr_val < stop_val) {
+  curr_val <- curr_val + 1
+  print(curr_val)
+}
+```
+```{r}
+my_vector <- c(1,2,3,4,5)
+```
+```{r}
+my_matrix <- matrix(data = 1:10, nrow = 5, ncol = 6)
+my_matrix
+sum_rows_matrix <- apply(2, my_matrix)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

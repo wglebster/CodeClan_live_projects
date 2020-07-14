@@ -1,0 +1,3 @@
+"0","death_years <- mutate(all_deaths,"
+"0","                      years_survived = year_of_death - 298)"
+"0","death_years"

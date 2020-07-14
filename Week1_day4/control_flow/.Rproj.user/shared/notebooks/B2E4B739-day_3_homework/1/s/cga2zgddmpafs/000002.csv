@@ -1,0 +1,3 @@
+"0","#get beer data"
+"0","beer_data <- CodeClanData::beer"
+"0","head(beer_data, 2)"

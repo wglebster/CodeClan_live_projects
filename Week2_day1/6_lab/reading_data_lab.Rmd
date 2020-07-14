@@ -1,0 +1,100 @@
+---
+title: "Reading Data Lab"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE)
+```
+
+# Flat Files
+
+Read in the following datasets. You may need define the variable types, skip rows or give your own variable names in each of them.
+
+Before you read in each file, either view it in the Terminal (`less`) or open it in a text editor, so you can see what type it is. 
+
+1. `user-for-x.txt`
+2. `female_names.txt`
+3. `edinburgh-trees.csv`
+
+```{r}
+library(readr)
+uber_for_x <- read_tsv("data/uber-for-x.txt")
+```
+```{r}
+uber_for_x
+```
+
+
+```{r}
+female_names <- read_lines("data/female_names.txt")
+```
+```{r}
+female_names
+```
+
+
+```{r}
+edinburgh_trees <- read_csv("data/edinburgh-trees.csv", skip = 9, col_names = c("Latin Name", "Common Name", "Location", "Lat/Lon", "Age"))
+```
+```{r}
+edinburgh_trees
+```
+
+
+```{r}
+# You could read the names as a separate data-frame and use that to name the full data. Something like this:
+tree_names <- read_csv("data/edinburgh-trees.csv", skip = 2, n_max = 5, col_names = c("letter", "name"))
+
+trees <- read_csv("data/edinburgh-trees.csv", skip = 9, col_names = tree_names$name)
+```
+```{r}
+trees
+```
+
+# Excel Files
+
+
+Take the `populism` dataset that we read in earlier and write it to an Excel file. In the Excel file, you want the data for each region in a different sheet.
+
+
+```{r, eval = FALSE}
+library(readxl)
+library(openxlsx)
+
+populism <- read_excel("data/populism.xlsx")
+
+populism_list <- split(populism, populism$region)
+
+write.xlsx(populism_list, file='data/populism_by_region.xlsx')
+```
+
+# JSON
+
+Parse the file `starwars.json` as:
+
+1. a `list`
+2. a `data.frame`
+
+
+```{r}
+library(jsonlite)
+
+raw_starwars <- read_file("data/starwars.json")
+starwars <- parse_json(raw_starwars)
+```
+
+
+```{r}
+starwars_df <- fromJSON(raw_starwars)
+```
+
+
+

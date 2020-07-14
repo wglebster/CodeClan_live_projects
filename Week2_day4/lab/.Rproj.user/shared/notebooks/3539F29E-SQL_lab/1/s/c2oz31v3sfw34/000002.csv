@@ -1,0 +1,5 @@
+"0","```r
+dbDisconnect(db_conect)
+```"
+"1","[1] TRUE
+"

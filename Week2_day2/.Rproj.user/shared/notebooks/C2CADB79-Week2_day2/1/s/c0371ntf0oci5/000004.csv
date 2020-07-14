@@ -1,0 +1,5 @@
+"0","# this closes db connection "
+"0","dbDisconnect(conn = db_connect)"
+"2","Error in (function (classes, fdef, mtable)  : 
+  unable to find an inherited method for function ‘dbDisconnect’ for signature ‘""logical""’
+"

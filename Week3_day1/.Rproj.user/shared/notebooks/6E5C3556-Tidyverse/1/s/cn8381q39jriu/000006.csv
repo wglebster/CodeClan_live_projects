@@ -1,0 +1,3 @@
+"0","years_extract <- data_frame1 %>%"
+"0","  select(""Index"",""State"",""Y2002"", ""Y2003"", ""Y2004"", ""Y2005"", ""Y2006"", ""Y2007"", ""Y2008"")"
+"0","years_extract"

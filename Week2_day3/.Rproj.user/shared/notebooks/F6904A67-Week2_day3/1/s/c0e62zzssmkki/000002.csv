@@ -1,0 +1,5 @@
+"0","SELECT 
+  country,
+  COUNT(id) AS num_employees
+FROM employees
+GROUP BY country"

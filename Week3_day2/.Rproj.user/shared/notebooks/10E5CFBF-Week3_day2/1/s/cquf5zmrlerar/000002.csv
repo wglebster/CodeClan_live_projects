@@ -1,0 +1,1 @@
+"0","inner_join(customers_adjusted, orders, by = c(""identifier"" = ""customer_ID""))"

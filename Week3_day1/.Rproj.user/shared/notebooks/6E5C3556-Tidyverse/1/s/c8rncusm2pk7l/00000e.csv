@@ -1,0 +1,7 @@
+"0","filtered <- filter(all_deaths, allegiances == ""Lannister"")"
+"0",""
+"0","#multiple value filter"
+"0",""
+"0","filtered <- filter(all_deaths, allegiances %in% c(""Lannister"", ""House Lannister""))"
+"0",""
+"0","filtered"

@@ -1,0 +1,5 @@
+"0","```sql
+SELECT * 
+  FROM animals 
+  LEFT JOIN diets ON animals.diet_id = diets.id
+```"

@@ -1,0 +1,5 @@
+"0","#This function calculates the nth triangle using formula: Tn = n( n+1 ) / 2"
+"0","nth_triangle <- function(x){"
+"0","  result <- x*(x+1)/2"
+"0","  return(result)"
+"0","}"

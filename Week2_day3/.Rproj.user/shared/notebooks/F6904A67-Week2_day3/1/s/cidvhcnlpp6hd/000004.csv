@@ -1,0 +1,6 @@
+"0","SELECT 
+  country,
+  COUNT(id) AS num_employees
+FROM employees
+WHERE first_name IS NULL
+GROUP BY country"

@@ -1,0 +1,4 @@
+"0","SELECT * FROM employees
+WHERE country = 'Greece' AND last_name LIKE 'Mc%'
+-- % is a wildcard
+"

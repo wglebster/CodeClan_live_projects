@@ -1,0 +1,5 @@
+"0","age <- c(25, 56, 40)"
+"0","gender <- c(""female"", ""female"", ""male"")"
+"0","shoe_size <- c(7, 5, 13)"
+"0","is_satisfied <- c(TRUE, TRUE, FALSE)"
+"0","shoe_satisfaction <- data.frame(age, gender, shoe_size, is_satisfied)"

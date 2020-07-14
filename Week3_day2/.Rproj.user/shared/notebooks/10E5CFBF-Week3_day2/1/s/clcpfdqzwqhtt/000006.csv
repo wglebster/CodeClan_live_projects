@@ -1,0 +1,1 @@
+"0","ggplot(comms_data_median, aes(customerID, monthly_charges)) + geom_point()"

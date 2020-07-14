@@ -1,0 +1,11 @@
+"0","SELECT
+  first_name,
+  last_name,
+  salary,
+    CASE
+        WHEN salary < 40000 THEN 'Low'
+        WHEN salary >= 40000 THEN 'High'
+        ELSE 'Salary record is missing'
+    END AS salary_class
+FROM employees
+ORDER BY salary DESC NULLS LAST"

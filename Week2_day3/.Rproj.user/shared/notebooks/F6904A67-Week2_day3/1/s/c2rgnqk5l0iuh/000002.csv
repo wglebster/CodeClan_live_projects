@@ -1,0 +1,3 @@
+"0","SELECT 
+DISTINCT(department)
+FROM employees"

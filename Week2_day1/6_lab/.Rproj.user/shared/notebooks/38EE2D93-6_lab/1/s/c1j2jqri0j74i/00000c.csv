@@ -1,0 +1,2 @@
+"0","populism <- readxl::read_xlsx(""data/populism.xlsx"")"
+"0","populism"

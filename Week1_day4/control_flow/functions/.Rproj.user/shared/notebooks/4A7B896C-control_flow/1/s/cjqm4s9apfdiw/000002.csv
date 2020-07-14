@@ -1,0 +1,6 @@
+"0","```r
+chars <- c(\"Cat\", \"Monkey\")
+ifelse(chars == \"Monky\", \"Monkey\", chars)
+```"
+"1","[1] \"Cat\"    \"Monkey\"
+"

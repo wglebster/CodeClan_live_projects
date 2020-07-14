@@ -1,0 +1,8 @@
+"0","SELECT 
+  employees.*, committees.name AS committee_name
+FROM employees 
+INNER JOIN employees_committees
+  ON employees.id = employees_committees.employee_id
+INNER JOIN committees
+  ON employees_committees.committee_id = committees.id
+WHERE employees.country = 'China'"

@@ -1,0 +1,4 @@
+"0","```r
+student_df$sex<-recode(sex, \"1\" = \"male\", \"2\" = \"female\" )
+student_df
+```"

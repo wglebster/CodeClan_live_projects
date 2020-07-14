@@ -1,0 +1,19 @@
+---
+title: "Sourced functions here"
+output: html_notebook
+---
+This is to import custom written functions into the (analysis) file 
+```{r}
+source("my_functions.R")
+```
+```{r}
+add_two(multiply_by_n(2,4))
+```
+```{r}
+library(lubridate)
+
+```
+
+
+
+

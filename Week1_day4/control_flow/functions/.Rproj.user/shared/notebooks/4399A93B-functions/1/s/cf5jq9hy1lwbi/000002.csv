@@ -1,0 +1,17 @@
+"0","debugonce((make_ordered_list))"
+"0","make_ordered_list(hats)"
+"1","debugging in: "
+"1","make_ordered_list(hats)
+"
+"1","debug at #1: "
+"1","{
+"
+"1","    my_list_sorted <- sort(my_list)
+"
+"1","    my_list_joined <- paste(my_list_sorted, collapse = "", "")
+"
+"1","    paste(""Ordered list:"", my_list_joined)
+"
+"1","}
+"
+"0","Q"

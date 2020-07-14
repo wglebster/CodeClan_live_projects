@@ -1,0 +1,6 @@
+"0","```r
+colMeans(weather_matrtix)
+```"
+"1"," Thu  Fri  Sat  Sun  Mon  Tue  Wed 
+16.5 16.5 15.5 17.5 18.0 19.0 18.5 
+"

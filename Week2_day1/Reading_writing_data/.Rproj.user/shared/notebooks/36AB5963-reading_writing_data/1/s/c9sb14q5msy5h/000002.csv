@@ -1,0 +1,11 @@
+"0","weekly_sst <- read_table(""https://www.cpc.ncep.noaa.gov/data/indices/wksst8110.for"","
+"0","                         skip = 4, "
+"0","                         col_names = c(""Nino1+2"",	""Nino3"",	""Nino34""))"
+"2","Parsed with column specification:
+cols(
+  `Nino1+2` = [31mcol_character()[39m,
+  Nino3 = [31mcol_character()[39m,
+  Nino34 = [31mcol_character()[39m
+)
+"
+"0","head(weekly_sst)"

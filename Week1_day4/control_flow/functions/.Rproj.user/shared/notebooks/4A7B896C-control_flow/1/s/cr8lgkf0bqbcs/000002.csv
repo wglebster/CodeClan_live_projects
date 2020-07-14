@@ -1,0 +1,8 @@
+"0","```r
+name <- c(\"John\", \"Clara\", \"Smith\")
+sex <- c(1, 2, 1)
+age <- c(30, 32, 54)
+# create a new dataframe
+student_df <- data.frame(name, sex, age)
+student_df
+```"

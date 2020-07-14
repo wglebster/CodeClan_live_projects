@@ -1,0 +1,6 @@
+"0","```r
+rowMeans(weather_matrtix)
+```"
+"1","  week_1   week_2 
+17.28571 17.42857 
+"
