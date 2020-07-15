@@ -262,6 +262,15 @@ anti_join(customers, orders, by = "customer_ID")
 
 # Binding
 
+```{r}
+statuses <- tibble(
+  status = as.factor(c("active", "active", "inactive", "inactive", "active", "inactive"))
+)
+statuses
+```
+```{r}
+bind_cols(customers, statuses)
+```
 
 
 

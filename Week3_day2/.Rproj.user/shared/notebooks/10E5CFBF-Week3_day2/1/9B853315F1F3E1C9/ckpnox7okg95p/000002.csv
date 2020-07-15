@@ -1,4 +1,0 @@
-"0","statuses <- tibble("
-"0","  status = as.factor(c(""active"", ""active"", ""inactive"", ""inactive"", ""active"", ""inactive""))"
-"0",")"
-"0","statuses"

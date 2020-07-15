@@ -1,0 +1,67 @@
+---
+title: "REGEX lab"
+output: html_notebook
+---
+
+```{r}
+thought_police <- whole_text %>%
+  str_detect("Thought Police")
+thought_police
+```
+```{r}
+count_big_bro <- whole_text %>%
+  str_count("[bB][iI][gG] [bB][rR][oO][tT][hH][eE][rR]")
+count_big_bro
+```
+
+```{r}
+julia <- whole_text %>%
+  str_detect("[jJ]ulia")
+
+julia
+```
+```{r}
+find_date <- whole_text %>%
+  str_extract_all("[A-Z][a-z]+ [0-9][a-z]{2}, [0-9]{4}")
+find_date
+```
+
+```{r}
+redact_winston <- whole_text %>%
+  str_replace_all("[wW]inston", "IT WASN'T HIM ")
+redact_winston
+```
+
+```{r}
+ victory <- whole_text %>%
+   str_replace_all(" [:punctuation:]*[gG][iI][nN][:punctuation:]* ", " VODKA ") %>%
+ victory
+
+str_extract_all(whole_text, "[:punctuation:]*[gG][iI][nN][:punctuation:]*")
+```
+```{r}
+rebranding <- whole_text %>%
+  str_replace_all("[dD][eE][pP][aA][rR][tT][mM][eE][nN][tT]", " Section ") %>%
+  str_replace_all("Ministry", "Department") %>%
+  str_replace_all("Ministri", "Department") %>%
+  str_replace_all("Mini", "Dep")
+rebranding
+```
+
+#Pipe the censorship...
+
+```{r}
+whole_text_censored <- whole_text %>%
+  str_replace_all("[wW]inston", "IT WASN'T HIM ") %>%
+  str_replace_all(" [:punctuation:]*[gG][iI][nN][:punctuation:]* ", " VODKA ") %>%
+  str_replace_all("[dD][eE][pP][aA][rR][tT][mM][eE][nN][tT]", " Section ") %>%
+  str_replace_all("Ministry", "Department") %>%
+  str_replace_all("Ministri", "Department") %>%
+  str_replace_all("Mini", "Dep")
+
+
+whole_text_censored
+```
+
+
+

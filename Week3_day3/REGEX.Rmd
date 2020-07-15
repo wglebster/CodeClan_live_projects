@@ -1,0 +1,99 @@
+---
+title: "RREGEX"
+output: html_notebook
+---
+```{r}
+library(stringr)
+```
+
+```{r}
+single_string <- "string a"
+strings <- c("string a", "string b", "string c", "string d", "striiiiiiing e")
+```
+
+```{r}
+pattern <- "a"
+
+single_string %>%
+str_detect(pattern, negate = TRUE)
+```
+```{r}
+strings %>%
+  str_detect(pattern)
+```
+```{r}
+pattern <- "str"
+strings %>% 
+  str_detect(pattern)
+```
+```{r}
+pattern <- "[a-zA-Z][a-zA-Z]" 
+# is case sensitive 
+# [] one of chars that is in the brackets
+#"i{3}" to specify number of occurences of a specific char
+strings %>% 
+  str_detect(pattern)
+```
+```{r}
+str1 <- "We're having great fun learning about data analysis at CodeClan!"
+str2 <- "CodeClan is at 37 Castle Terrace in Edinburgh, ClockWise in Glasgow, and Wasps Academy in            Inverness"
+str3 <- "Our cohort code starts with DE, DG or D"
+str4 <- "You get a great view of the castle or the national conservatoire from just outside CodeClan's door"
+all_strings <- c(str1, str2, str3, str4)
+```
+
+```{r}
+pattern1 <- "CodeClan"
+pattern2 <- "A-Z{2}"
+pattern3 <- "[cC]astle"
+```
+
+```{r}
+str_detect(all_strings, pattern2)
+str_detect(all_strings, pattern3)
+str_detect(all_strings, pattern3, negate = TRUE)
+```
+```{r}
+emails_to_extract <- c(
+  "This string has an_address@emailcom in it", 
+  "This one has user.name@company.co.uk", 
+  "Now we've got other_person_123@server.net and my.name@runningoutofideas.com"
+)
+```
+```{r}
+atoz_pattern <- "[a-z0-9._]+@[a-z0-9._]+"
+
+#emails_to_extract %>%
+ # str_extract(atoz_pattern)
+
+emails_to_extract %>%
+  str_extract_all(atoz_pattern)
+```
+
+##Kleene star *
+
+```{r}
+string <- "@emailprovider.com"
+pattern_kleene <- "[a-z]*@emailprovider.com" #* means zero or more times / + one or more times
+```
+
+##Replacing
+```{r}
+atoz_pattern <- "[a-z0-9._]+@[a-z0-9._]+"
+
+emails_to_extract %>%
+  str_replace_all(atoz_pattern, "REDACTED")
+```
+
+## UNICODE
+```{r}
+bank_string <- "I've got \u00A3100000 in my bank account."
+bank_string
+```
+```{r}
+unicode_pattern <- "\u00A3[0-9]+"
+
+bank_string %>%
+  str_extract(unicode_pattern)
+```
+

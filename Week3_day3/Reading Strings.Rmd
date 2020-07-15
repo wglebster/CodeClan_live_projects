@@ -1,0 +1,193 @@
+---
+title: "Reading strings"
+output: html_notebook
+---
+#Basics
+```{r}
+escaping_special_chars <- 'I won\'t have any problems with this - escaping a single quote'
+escaping_special_chars
+double_quotes_escaping <- "Escaping \\"double quotes"" # is more complicated
+double_quotes_escaping
+```
+```{r}
+emplty_string <- ""
+not_empty_string <- " "
+emplty_string == not_empty_string
+```
+```{r}
+character_vector <- character(5)
+character_vector
+```
+```{r}
+character_vector[1] <- "replacement string"
+character_vector
+```
+```{r}
+character_vector[6] <- "added a string"
+character_vector
+```
+```{r}
+character_vector[10] <- "skipped indexes"
+character_vector
+```
+#Manipulating strings with Tidyverse
+```{r}
+library(tidyverse)
+```
+##Concatenate
+```{r}
+# str_c() str_join()
+str_c("This", "is", "easy") #no separator
+str_c("This", "is", "easy", sep = " ") #with a space separator
+#str_c() skipps nulls
+str_c("Nulls", "have", "disappeared", NULL, NULL, sep = " ")
+```
+Base R alternatives are paste and paste0, but its best to use str_c() going forward
+
+##Casing
+```{r}
+pangram <- "The quick brown fox jumps over the lazy dog."
+```
+```{r}
+pangram1 <- pangram %>%
+  str_to_upper() %>%
+  str_to_lower() %>%
+  str_to_title() %>%
+  str_to_sentence()
+pangram1
+pangram
+```
+##splitting
+```{r}
+unbroken_string <- "We're going to break this string up."
+```
+```{r}
+unbroken_string %>% 
+  str_split(" ") %>%
+  flatten_chr() # returns a vector instead of a list
+```
+```{r}
+unbroken_string %>% 
+  str_split(" ") %>%
+  flatten_chr() # returns a vector instead of a list
+```
+
+```{r}
+unbroken_string %>% 
+  str_split("") %>%
+  flatten_chr() # returns a vector instead of a list
+```
+```{r}
+manipulate <- c("Manipulate")
+strings <- c("strings")
+is <- c("is")
+funn <- c("fun!")
+```
+```{r}
+manipulate_strings_is_fun <- str_c(manipulate, strings, is, funn, sep = " ")
+manipulate_strings_is_fun_cap <- str_to_upper(manipulate_strings_is_fun)
+manipulate_strings_is_fun_cap
+manipulate_strings_is_fun_split <- str_split(manipulate_strings_is_fun_cap,"")
+manipulate_strings_is_fun_split
+```
+#Substrings (selecting parts of strings)
+
+```{r}
+full_string <- "Let's grab a substring from this!"
+full_string
+```
+```{r}
+#fixed start & end substring
+full_string %>%
+  str_sub(start = 1, end = 5)
+```
+```{r}
+#find last 5 letters
+full_string %>%
+  str_sub(start = -5, end = -1)
+```
+```{r}
+another_string <- "We're going to chop the first word off tis!"
+
+another_string %>% 
+  str_sub(7)
+```
+```{r}
+one_more_string <- "Lots of substrings!"
+
+one_more_string %>% 
+  str_sub(1:5, 10)
+```
+```{r}
+original_string <- "We're going to replace some words"
+
+original_string
+```
+```{r}
+str_sub(original_string, 1, 22) <- "I've changed"
+
+original_string
+```
+```{r}
+str_sub(original_string, -10) <- "everything!"
+original_string
+```
+
+##Numbers in strings
+
+```{r}
+number <- 123456.789
+```
+```{r}
+number %>%
+  format()
+```
+```{r}
+number %>% 
+  format(nsmall = 2)
+```
+```{r}
+#comma decimal separator
+number %>%
+  format(nsmall = 2, decimal.mark = ",")
+```
+
+```{r}
+#thousands separator
+number %>%
+  format(nsmall = 2, big.mark = ",", big.interval = 3)
+```
+
+##UNICODE (UTF - unicode text format)
+
+```{r}
+bank_statement <- "I've got $10000 in my bank account!"
+bank_statement
+```
+```{r}
+unicode_bank_statement <- "I've got \u00A310000 in my bank account" # unicode is not case sensitive
+unicode_bank_statement
+```
+```{r}
+#substringing unicode
+str_sub(unicode_bank_statement, 10, 10) <- "\u20AC"
+unicode_bank_statement
+```
+```{r}
+conc_string <- str_c("I", "love", "using", "strings", "in", "reports!", sep = " ")
+conc_string_unicode <- str_extract(conc_string, "\u0021")
+conc_string_unicode
+conc_string_sub1 <- str_replace(conc_string, "\u0021", "\u003f")
+conc_string_sub1
+conc_string_sub2 <- str_replace(conc_string, "I love using", "Isn't working with")
+conc_string_sub2
+conc_string_sub3 <- str_replace(conc_string_sub2, "in reports!", "really interesting")
+conc_string_sub3
+
+
+```
+
+
+
+
+
