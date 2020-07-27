@@ -22,7 +22,7 @@ julia
 ```
 ```{r}
 find_date <- whole_text %>%
-  str_extract_all("[A-Z][a-z]+ [0-9][a-z]{2}, [0-9]{4}")
+  str_extract_all("[A-Z][a-z]+ [0-9]+[a-z]{2}, [0-9]{4}")
 find_date
 ```
 
@@ -34,10 +34,10 @@ redact_winston
 
 ```{r}
  victory <- whole_text %>%
-   str_replace_all(" [:punctuation:]*[gG][iI][nN][:punctuation:]* ", " VODKA ") %>%
+   str_replace_all(" [:punct:]*[gG][iI][nN][:punctuation:]* ", " VODKA ") %>%
  victory
 
-str_extract_all(whole_text, "[:punctuation:]*[gG][iI][nN][:punctuation:]*")
+str_extract_all(whole_text, "[:punctuation:]*[gG][iI][nN][:punct:]*")
 ```
 ```{r}
 rebranding <- whole_text %>%

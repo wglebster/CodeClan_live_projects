@@ -1,0 +1,74 @@
+---
+title: "Untitled"
+author: "Gleb V"
+date: "20/07/2020"
+output: html_document
+---
+yaml: yet another markup language
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Markdown is a very simple markup language
+<h1>This would be the largest heading</h1>
+# This is the markdown equivalent
+<h6>Smaller heading</h6>
+###### Equivalent in markdown
+\# escapes
+# Emphasis
+<b>HTML bold</b>
+**Markdown bold**  
+__Equivalent__
+<i>Italics in HTML</i>
+*Markdown italics*
+_Equivalent_
+# Lists
+<ol>
+  <li>These elements</li>
+  <li>... will be ...</li>
+  <li>numbered</li>
+</ol>
+<ul>
+  <li>These won't</li>
+  <li>be numbered</li>
+</ul>
+1. The first item
+2. The second item
+    * Notice this
+    * is indented
+3. Back to numbering
+# Links
+<a href="www.google.com">HTML links are annoying</a>
+[Markdown links are a little bit better](www.google.com)
+* Bullet
+* points
+# Task
+# Welcome to our page!
+  
+This is an example of how we **could** lay something out.
+  
+### Smaller headings are fun too!
+* This element is part of a list
+* So is this one
+* [This one's a link too!](https://http.cat/200)
+# Maths
+LaTex language for writing maths $\frac{2n}{n+1}$
+$$2x^2+x+4$$
+# Code
+```{r}
+x <- 4
+```
+```{r echo=FALSE}
+# statistical analysis
+y <- mean(rnorm(100))
+```
+The result was `r y`, neat huh?
+# Tables
+```{r}
+library(knitr)
+kable(mtcars)
+```
+| Name | Species | Age |
+|---|---|---|
+| Ella  | Tortoise | 6 |
+| Poppy | Dog | 2 |
+| Millie | Cat | 10 | 

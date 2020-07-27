@@ -1,0 +1,98 @@
+---
+title: "R_Markdown_intro"
+author: "Gleb V"
+date: "20/07/2020"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is how to make a sidebar menu
+
+`output: 
+  html_document:
+    toc: true
+    toc_float: true`
+
+language used in R markdown is "Markdown": https://www.markdownguide.org/getting-started/
+
+<h1>This is lv1 HTML heading</h>
+
+#\# hashtag used to define headings in Markdown h1 = \#, h6 = \#\#\#\#\#\#\#
+
+
+# Emphasis 
+
+Bold = 
+
+**Markdown bold**
+
+__Is the same__
+
+italics = 
+
+*italics*
+
+_italics_
+
+# Lists
+
+## Ordered list 
+
+1. This is
+
+2. a Markdown 
+
+2.1 ordered list
+
+  * This is 
+  * unordered list
+  
+# Links
+
+[Markdown link text](www.google.com)
+
+# TASK
+
+# Welcome to our page!
+
+This is an example of how we __could__ lay something out. 
+
+### Smaller headings are fun too!
+
+* This element is part of a list
+* So is this one
+* [This one is a link too!](https://http.cat/200)
+
+
+# WRITING MATHS WITH LaTex
+
+$\frac{2n}{n+1}$
+$$2xˆ2+x+4$$
+# REFERENCING A VARIABLE
+```{r echo=FALSE}
+y <- 3
+```
+The value of backtick y backtick should render the value stored in the variable y
+
+
+
+# Tables
+```{r}
+mtcars
+```
+
+## Manual tables
+
+| Name | Species | Age | 
+| --- | ---| --- |
+| Ella | Tortoise | 6 | 
+| Poppy | Dog | 2 | 
+| Millie | Cat | 10 | 
+
+Table gerator website:[https://www.tablesgenerator.com/markdown_tables](https://www.tablesgenerator.com/markdown_tables)

@@ -289,4 +289,3 @@ bind_cols(customers, statuses)
 
 
 
-
