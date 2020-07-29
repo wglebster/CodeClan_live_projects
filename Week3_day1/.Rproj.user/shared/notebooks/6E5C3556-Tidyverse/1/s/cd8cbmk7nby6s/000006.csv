@@ -1,5 +1,0 @@
-"0","#select specific columns"
-"0","deaths <- select(all_deaths, name, allegiances, year_of_death)"
-"0","#select all columns but specifiied "
-"0","deaths <- select(all_deaths, -name)"
-"0","deaths"

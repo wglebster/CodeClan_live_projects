@@ -1,5 +1,0 @@
-"0","```r
-ifelse(1:10 %% 2 == 0, \"Even\", \"Odd\")
-```"
-"1"," [1] \"Odd\"  \"Even\" \"Odd\"  \"Even\" \"Odd\"  \"Even\" \"Odd\"  \"Even\" \"Odd\"  \"Even\"
-"

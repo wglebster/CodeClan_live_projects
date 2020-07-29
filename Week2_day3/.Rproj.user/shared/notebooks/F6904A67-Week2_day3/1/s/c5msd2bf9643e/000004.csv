@@ -1,2 +1,0 @@
-"0","SELECT * FROM employees
-WHERE email IS NULL"

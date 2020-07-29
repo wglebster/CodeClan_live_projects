@@ -1,8 +1,0 @@
-"0","```r
-dbListFields(conn = db_conect, name = \"employees\")
-```"
-"1"," [1] \"id\"            \"first_name\"    \"last_name\"     \"email\"        
- [5] \"ip_address\"    \"mac_address\"   \"department\"    \"team_id\"      
- [9] \"grade\"         \"country\"       \"fte_hours\"     \"pension_enrol\"
-[13] \"salary\"        \"pay_detail_id\" \"start_date\"   
-"

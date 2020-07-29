@@ -1,7 +1,0 @@
-"0","```r
-db_connect <- dbConnect(drv = PostgreSQL(max.con = 1), user = remote_omni_postgresql_username, password = remote_omni_postgresql_username, dbname='cjitjeca', host='34.245.37.126')
-```"
-"1","Error in postgresqlNewConnection(drv, ...) : 
-  RS-DBI driver: (could not connect cjitjeca@34.245.37.126:5432 on dbname \"cjitjeca\": FATAL:  password authentication failed for user \"cjitjeca\"
-)
-"

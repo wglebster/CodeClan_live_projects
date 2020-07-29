@@ -1,6 +1,0 @@
-"0","```r
-temperature[chance_of_rain <= avg_rain]
-```"
-"1","Wednesday    Friday    Sunday 
-       12        14        15 
-"

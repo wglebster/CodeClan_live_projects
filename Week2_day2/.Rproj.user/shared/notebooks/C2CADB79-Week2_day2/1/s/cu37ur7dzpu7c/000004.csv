@@ -1,4 +1,0 @@
-"0","dbListTables(conn = db_connect)"
-"2","Error in (function (classes, fdef, mtable)  : 
-  unable to find an inherited method for function ‘dbListTables’ for signature ‘""logical""’
-"

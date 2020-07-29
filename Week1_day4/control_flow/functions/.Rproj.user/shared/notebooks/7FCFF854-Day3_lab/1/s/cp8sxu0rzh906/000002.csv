@@ -1,9 +1,0 @@
-"0","```r
-five_day_forecast <- data.frame(
-  day_of_week = days_of_week,
-  temp = temperature, 
-  chance_of_rain = chance_of_rain,
-  cloud_cover = cloud_cover
-)
-five_day_forecast
-```"

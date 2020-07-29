@@ -1,6 +1,0 @@
-"0","surnames <- read_lines(""data/surnames.txt"")"
-"0","length(surnames)"
-"1","[1]"
-"1"," 24"
-"1","
-"

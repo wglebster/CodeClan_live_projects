@@ -1,6 +1,0 @@
-"0","SELECT
-  department,
-  COUNT(id) AS number_of_employees
-FROM employees
-GROUP BY department
-"

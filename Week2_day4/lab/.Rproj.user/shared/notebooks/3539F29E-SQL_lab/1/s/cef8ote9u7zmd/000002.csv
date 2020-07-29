@@ -1,6 +1,0 @@
-"0","```sql
-SELECT 
-  MAX(salary) 
-FROM employees
-WHERE department = 'Engineering' AND fte_hours = '1.0';
-```"

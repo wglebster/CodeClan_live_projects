@@ -1,5 +1,0 @@
-"0","```r
-dbListTables(conn = db_conect)
-```"
-"1","[1] \"diets\"         \"animals\"       \"care_schedule\" \"keepers\"      
-"

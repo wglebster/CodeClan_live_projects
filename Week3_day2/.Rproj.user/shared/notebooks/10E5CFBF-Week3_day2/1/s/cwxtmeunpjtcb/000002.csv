@@ -1,2 +1,0 @@
-"0","customers_adjusted <- rename(customers, identifier = customer_ID)"
-"0","customers_adjusted"

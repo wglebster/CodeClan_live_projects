@@ -1,2 +1,0 @@
-"0","SELECT * FROM employees
-WHERE country = 'China' AND (start_date >= '2019-01-01' OR pension_enrol = TRUE);"

@@ -1,7 +1,0 @@
-"0","dbListFields(conn = db_conect, name = ""employees_committees"")"
-"1","[1]"
-"1"," ""id""          "
-"1"," ""employee_id"" "
-"1"," ""committee_id"""
-"1","
-"

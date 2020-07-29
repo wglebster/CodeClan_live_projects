@@ -1,7 +1,0 @@
-"0","chars <- c(""Cat"", ""Monkey"")"
-"0","ifelse(chars == ""Monky"", ""Monkey"", chars)"
-"1","[1]"
-"1"," ""Cat""   "
-"1"," ""Monkey"""
-"1","
-"

@@ -1,3 +1,0 @@
-"0","```r
-mean_temp <- mean(five_day_forecast$temp)
-```"

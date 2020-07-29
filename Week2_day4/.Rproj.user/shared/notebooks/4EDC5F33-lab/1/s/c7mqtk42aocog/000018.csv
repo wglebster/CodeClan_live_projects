@@ -1,7 +1,0 @@
-"2","Error in postgresqlExecStatement(conn, statement, ...) : 
-  RS-DBI driver: (could not Retrieve the result : ERROR:  syntax error at or near ""WHEN""
-LINE 3:       COUNT(WHEN salary < 40000 THEN 'Low')
-                    ^
-)
-"
-"2","Failed to execute SQL chunk"

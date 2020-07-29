@@ -1,7 +1,0 @@
-"0","#unite"
-"0",""
-"0","united_test <- hospital_visits_final %>%"
-"0","  unite(col = decease,"
-"0","        c(""code"", ""description""),"
-"0","        sep = "";"")"
-"0","united_test"

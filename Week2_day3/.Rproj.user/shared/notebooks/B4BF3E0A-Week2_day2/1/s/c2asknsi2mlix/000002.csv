@@ -1,7 +1,0 @@
-"0","```r
-dbGetQuery(conn = db_connect, statement = 
-             \"SELECT * FROM cjitjeca\")
-```"
-"1","Error in (function (classes, fdef, mtable)  : 
-  unable to find an inherited method for function ‘dbGetQuery’ for signature ‘\"logical\", \"character\"’
-"

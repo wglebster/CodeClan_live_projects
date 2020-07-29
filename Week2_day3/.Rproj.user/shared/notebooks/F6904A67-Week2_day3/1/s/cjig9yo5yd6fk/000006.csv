@@ -1,8 +1,0 @@
-"0","SELECT 
-  department,
-  COUNT(id) AS num_of_employees
-FROM employees
-WHERE fte_hours IN(0.25, 0.5)
-GROUP BY department
-HAVING COUNT(id) >= 40
-"

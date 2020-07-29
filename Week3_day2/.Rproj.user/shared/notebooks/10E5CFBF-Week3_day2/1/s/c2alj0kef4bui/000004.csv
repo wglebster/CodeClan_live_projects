@@ -1,3 +1,0 @@
-"0","video_games_upcase <- mutate_all(video_games_clean, "
-"0","                                 .funs = toupper)"
-"0","video_games_upcase"

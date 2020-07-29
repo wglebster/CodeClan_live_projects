@@ -1,3 +1,0 @@
-"0","abc_states <- rename_index_col %>%"
-"0","  filter(first_letter %in% c(""A"", ""B"", ""C""))"
-"0","abc_states"

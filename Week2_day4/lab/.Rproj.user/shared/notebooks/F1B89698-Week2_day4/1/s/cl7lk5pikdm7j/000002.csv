@@ -1,5 +1,0 @@
-"0","```sql
-SELECT * 
-  FROM animals 
-  RIGHT JOIN diets ON animals.diet_id = diets.id
-```"

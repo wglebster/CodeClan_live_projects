@@ -1,2 +1,0 @@
-"0","reverse_order <- rev(five_day_forecast$day_of_week)"
-"0","five_day_forecast[reverse_order, ]"

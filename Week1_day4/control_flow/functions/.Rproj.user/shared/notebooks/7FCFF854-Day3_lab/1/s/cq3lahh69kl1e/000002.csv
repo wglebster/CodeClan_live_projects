@@ -1,9 +1,0 @@
-"0","```r
-days_of_week <- factor(c(\"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"), 
-                       levels = c(\"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"),
-                       ordered = TRUE)
-
-names(temperature) <- days_of_week
-names(chance_of_rain) <- days_of_week
-names(cloud_cover) <- days_of_week
-```"

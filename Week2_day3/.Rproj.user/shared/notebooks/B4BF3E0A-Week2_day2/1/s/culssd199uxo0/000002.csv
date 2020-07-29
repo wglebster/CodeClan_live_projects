@@ -1,6 +1,0 @@
-"0","```r
-dbListTables(conn = my_db_connection)
-```"
-"1","[1] \"teams\"                \"employees\"            \"pay_details\"         
-[4] \"employees_committees\" \"committees\"          
-"

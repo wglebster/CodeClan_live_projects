@@ -1,5 +1,0 @@
-"0","SELECT
-  AVG(salary) AS avg_HR_salary
-FROM employees
-WHERE department = 'Human Resources'
-"

@@ -1,0 +1,281 @@
+---
+title: "GG Plot intro"
+output: html_notebook
+---
+```{r}
+library(ggplot2)
+library(CodeClanData)
+```
+```{r}
+students
+```
+## basics.
+```{r}
+ggplot(students) + 
+  geom_bar(aes(x = superpower, fill = school_year), position = "fill") + 
+  scale_fill_brewer()
+```
+```{r}
+ggplot(students) + 
+  geom_bar(aes(x = superpower, fill = school_year), position = "dodge") + 
+  scale_fill_brewer()
+```
+
+## statistical transformation
+```{r}
+ggplot(students) + 
+  geom_bar(aes(x = superpower, fill = school_year), stat = "count") + 
+  scale_fill_brewer()
+```
+```{r}
+library(tidyverse)
+
+count_data <- students %>%
+  group_by(superpower, school_year) %>%
+  summarise(counts = n())
+
+count_data %>%
+  ggplot() + 
+  geom_bar(aes(x = superpower, y = counts, fill = school_year), stat = "identity")
+#stat = "identity" to use if I want to keep a variable (in this case y = counts) the same.
+```
+
+geom_bar - used if data hasn't been precounted
+geom_col - if data has been precounted
+
+## labels
+
+```{r}
+ggplot(students) + 
+  geom_bar(aes(x = superpower, fill = school_year)) + 
+  labs(x = "Superpower", 
+       y = "Count", 
+       title = "Preferred superpower by school year", 
+       subtitle = "data from students around the world", 
+       fill = "school year") + 
+scale_fill_brewer()
+```
+```{r}
+ggplot(students) +
+  geom_point(aes(x = height_cm, y = reaction_time, colour = superpower)) + 
+  geom_jitter(aes(x = height_cm, y = reaction_time, colour = superpower), width = 5, height = 0.5) 
+```
+
+
+```{r}
+top_10 <- olympics_overall_medals %>%
+  arrange(count) %>% 
+  top_n(10)
+top_10
+
+ggplot(top_10) + 
+  geom_bar(aes(x = team, y = count, fill = medal), stat = "identity") + 
+  labs(x = "Team", 
+       y = "Count of medals", 
+       title = "Count of Olympic medals by team",
+       fill = "Medals") + 
+scale_fill_brewer()
+```
+This plot summarises the number of medals each team had. On X axis are the team names, Y axis shows total number of each type of medals each team had 
+
+```{r}
+data("ChickWeight")
+head(ChickWeight)
+```
+Track the weight of each chick in time, color lines by die time.
+
+```{r}
+ggplot(ChickWeight) + 
+  #a common aes() can be added to avoid redundancy.
+  #aes(x = Time, y = weight, colour = Diet)
+  geom_line(aes(x = Time, y = weight, group = Chick, colour = Diet), alpha = 0.1
+            ) + 
+  geom_point(aes(x = Time, y = weight, colour = Diet), alpha = 0.2
+             ) + 
+  geom_smooth(aes(x = Time, y = weight, colour = Diet))
+```
+```{r}
+head(pets)
+
+ggplot(pets) + 
+  aes(x = age, y = weight) + 
+  geom_point(aes(colour = sex), size = 5) +
+  geom_text(aes(label = name), 
+            nudge_x = 0.5, 
+            nudge_y = 0.1)
+
+ggsave("g1_sav.pdf")
+```
+
+
+# Facets
+One plot converted into many plots using facet_wrap() or facet_grid()
+
+```{r}
+ggplot(ChickWeight) + 
+  aes(x = Time, y = weight, group = Chick, colour = Diet) + 
+  geom_line() + 
+  facet_wrap(~ Diet, ncol = 4) # ~ means "varis with" or "depending on"
+```
+```{r}
+benefits
+
+ggplot(benefits) +
+  aes(age) +
+  geom_histogram(col = "white")  + 
+  facet_wrap(~sex, nrow = 2)
+```
+
+```{r}
+ggplot(benefits) +
+  geom_histogram(aes(x = age, fill = sex), col = "white") + 
+  facet_grid(married ~ sex) #rows ~ columns
+```
+```{r}
+ggplot(benefits) + 
+  geom_histogram(aes(x = age), col = "white", fill = "dark green") + 
+  facet_grid(married ~ dkids, labeller = "label_both")
+```
+
+```{r}
+ggplot(benefits) + 
+  geom_histogram(aes(x = age), col = "white", fill = "dark green") + 
+  facet_wrap(~sex, ncol = 2, scales = "free")
+```
+## bins / binning
+
+cut_iterval(x, n) - divides data into n bins, each bin same width.
+cut_width(x, width) - divides data into n bins, each bin of width wide.
+cut_number(x, n) - divides data into n n bins. 
+```{r}
+library(tidyverse)
+
+```
+```{r}
+benefits <- benefits %>%
+  mutate(
+    tenure_interval = cut_interval(tenure, 4), 
+    tenure_width = cut_width(tenure, 15),
+    tenure_number = cut_number(tenure, 4)
+  )
+
+ggplot(benefits) + 
+  geom_histogram(aes(x = age), col = "white") + 
+  facet_wrap(~tenure_interval)
+
+ggplot(benefits) + 
+  geom_histogram(aes(x = age), col = "white") + 
+  facet_wrap(~tenure_number)
+```
+# Aesthetics
+
+```{r}
+ggplot(pets) + 
+  aes(age, weight, colour = sex) + 
+  geom_point() + 
+  scale_x_continuous(breaks = c(1, 6, 10), 
+                     labels = c("1" = "Baby",
+                                "6" = "Grown up",
+                                "10" = "Over the hill")) + 
+  scale_y_continuous(breaks = c(6,8,10),
+                     labels = c("6" = "Small",
+                                "8" = "Medium",
+                                "10" = "Large"))
+```
+```{r}
+library(scales)
+```
+```{r}
+ggplot(flatPrices) + 
+  aes(x = Date, y = AvgFlatPrice) + 
+  geom_line() + 
+  ylab("average flat price \n") + 
+  scale_y_continuous(labels = scales::dollar_format(prefix = "£"))
+```
+
+
+```{r}
+flatPrices <- flatPrices %>%
+  mutate(percent_change = AvgFlatPrice/AvgFlatPrice[1])
+
+ggplot(flatPrices) + 
+  aes(x = Date, y = percent_change) + 
+  geom_line() + 
+  scale_y_continuous(labels = scales::percent) + 
+  ylab("percent change relative to start \n")
+```
+
+### Changing limit of scales.
+
+```{r}
+ggplot(pets, aes(age, weight)) +
+  geom_point(aes(colour = sex), size = 4) +
+  scale_x_continuous(
+    name = "Age",
+    breaks = seq(13),
+    limits = c(1,8)
+  ) + 
+  scale_y_continuous(
+    name = "Weight",
+    breaks = c(6, 8, 10),
+    labels = c(
+      "6" = "Light",
+      "8" = "Normal",
+      "10" = "Heavy"
+    ), 
+    limits = c(1,8)
+  )
+```
+
+### Changing scale of the values
+
+```{r}
+ggplot(whisky) + 
+  aes(x = YearFound, y = Capacity, color = Region) + 
+  geom_point() +
+  #scale_x_reverse()
+  scale_y_continuous(trans = "log10")
+```
+
+```{r}
+ggplot(whisky) + 
+  aes(x = YearFound, fill = Region) + 
+  geom_histogram(bins = 30) +
+  #coord_flip()
+  coord_fixed()
+```
+### PieCharts
+
+```{r}
+snacks <- data.frame(
+  group = c("Cakes", "Biscuits", "Jaffa Cakes"),
+  count = c(30, 50, 20)
+)
+ggplot(snacks) + 
+  aes(x = " ", y = count, fill = group) +
+  geom_bar(width = 0.5, stat = "identity") + 
+  xlab("biscuits") + 
+  # to make a pie chart : 
+  coord_polar("y")
+```
+
+### Zoom in to an area
+
+```{r}
+ggplot(whisky) + 
+  aes(x = YearFound, y = Capacity, colour = Region) + 
+  geom_point(aes(colour = Region)) +  
+  geom_smooth() + 
+  xlim(1940,2000)  
+  #coord_cartesian()
+```
+
+
+
+
+
+
+
+
+
+

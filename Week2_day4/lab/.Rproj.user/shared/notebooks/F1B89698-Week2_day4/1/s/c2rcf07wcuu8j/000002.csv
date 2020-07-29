@@ -1,5 +1,0 @@
-"0","```r
-dbListFields(conn = db_conect, name = \"animals\")
-```"
-"1","[1] \"id\"      \"name\"    \"age\"     \"species\" \"diet_id\"
-"

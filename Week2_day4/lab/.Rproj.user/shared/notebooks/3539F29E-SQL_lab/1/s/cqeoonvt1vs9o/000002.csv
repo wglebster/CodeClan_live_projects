@@ -1,6 +1,0 @@
-"0","```sql
-SELECT 
-  COUNT(id) AS number_of_F_employees 
-FROM employees
-WHERE UPPER(first_name) LIKE 'F%';
-```"

@@ -1,2 +1,0 @@
-"0","#get z scores for refunds column"
-"0","refunds_zscore <- scores(refunds$refund_value)"

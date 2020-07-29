@@ -1,4 +1,0 @@
-"0","iris_variables <- iris %>%"
-"0","  select(-Species)"
-"0",""
-"0","boxplot(iris_variables)"

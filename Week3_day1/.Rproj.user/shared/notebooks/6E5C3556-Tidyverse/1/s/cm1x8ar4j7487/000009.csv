@@ -1,9 +1,0 @@
-"0","death_pipe <- all_deaths %>% "
-"0","  select(name, allegiances, nobility, year_of_death) %>%"
-"0","  mutate(years_survived = year_of_death - 298) %>%"
-"0","  group_by(allegiances) %>%"
-"0","  summarise(character_count = n()) %>%"
-"0","  arrange(desc(character_count))"
-"2","`summarise()` ungrouping output (override with `.groups` argument)
-"
-"0","death_pipe"

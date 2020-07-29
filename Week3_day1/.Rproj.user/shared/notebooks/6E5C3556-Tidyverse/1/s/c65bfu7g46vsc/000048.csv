@@ -1,9 +1,0 @@
-"0","nobility_percentage <- all_deaths %>%"
-"0","  filter(nobility == 1) %>%"
-"0","  group_by(allegiances) %>%"
-"0","  summarise(noble_count = n()) %>%"
-"0","  mutate(nobility_percent = noble_count / sum(noble_count) * 100) %>%"
-"0","  arrange(desc(nobility_percentage))"
-"2","`summarise()` ungrouping output (override with `.groups` argument)
-"
-"0","nobility_percentage"

@@ -1,7 +1,0 @@
-"0","SELECT
-  country,
-  AVG(salary) AS avg_salary
-FROM employees
-GROUP BY country
-HAVING COUNT(country) > 30
-ORDER BY avg_salary DESC"

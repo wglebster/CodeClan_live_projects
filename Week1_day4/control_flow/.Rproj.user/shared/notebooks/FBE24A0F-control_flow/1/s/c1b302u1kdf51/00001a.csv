@@ -1,2 +1,0 @@
-"0","student_df$sex<-recode(sex, ""1"" = ""male"", ""2"" = ""female"" )"
-"0","student_df"

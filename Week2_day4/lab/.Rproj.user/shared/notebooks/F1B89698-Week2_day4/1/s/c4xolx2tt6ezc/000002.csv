@@ -1,9 +1,0 @@
-"0","```sql
-SELECT
-  animals.name, --will return only the name coumn from animals table
-  animals.age,
-  diets.diet_type
-  FROM animals
-INNER JOIN diets ON animals.diet_id = diets.id
-WHERE animals.age > 4
-```"

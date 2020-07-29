@@ -1,6 +1,0 @@
-"0","SELECT 
-  department,
-  COUNT(id) AS num_of_employees
-FROM employees
-WHERE fte_hours BETWEEN 0.25 AND 0.5 -- could do IN(0.25, 0.5) instead of BETWEEN
-GROUP BY department"

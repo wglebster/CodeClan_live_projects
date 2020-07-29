@@ -1,9 +1,0 @@
-"0","```r
-if(expression){
-  do_code_if_true
-} else {
-  do_code_if_false
-}
-```"
-"1","Error in if (expression) { : argument is not interpretable as logical
-"

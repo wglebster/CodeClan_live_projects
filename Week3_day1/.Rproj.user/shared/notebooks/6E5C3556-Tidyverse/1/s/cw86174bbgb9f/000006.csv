@@ -1,3 +1,0 @@
-"0","income_change <- greatest_income_abc %>%"
-"0","  mutate(income_change = (Y2008 - Y2002))"
-"0","income_change"

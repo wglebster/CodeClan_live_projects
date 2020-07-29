@@ -1,7 +1,0 @@
-"0","```r
-table(test_results)
-```"
-"1","test_results
- 3  5  6  7  8  9 10 
- 2  4  1  4  2  6  1 
-"

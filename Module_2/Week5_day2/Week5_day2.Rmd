@@ -1,0 +1,190 @@
+---
+title: "Adding colours to plots & legends. Themes"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+```
+
+# Colours. 
+
+Colours are represented in hexadecimal or HCL (hue chroma, luminescence) or just colour name i.e. "black" format.
+```{r, eval=FALSE}
+"black" 
+"#00878F"
+hcl(200,50,50)
+```
+
+```{r}
+library(CodeClanData)
+```
+```{r}
+ggplot(pets) + 
+  aes(x = weight, y = age, colour = sleep) +
+  geom_point(size = 5) + 
+  #scale_colour_gradient(low = "grey100", high = "grey0")
+  scale_colour_gradient2(low = "blue", high = "red", mid = "white", midpoint = 17)
+```
+```{r}
+ggplot(volcano) +
+  aes(x = x, y = y, fill = height) + 
+  geom_raster() +
+  #scale_fill_gradientn(colours = colorspace::terrain_hcl(6)) #can also define colours = c("red", "green", "blue)
+  #colorbrewer is the best!
+  #DISTILLER is for continuous data
+  scale_fill_distiller(palette = "RdPu")
+```
+```{r}
+ggplot(temp_df) +
+  geom_raster(aes(x = month, y = year, fill = max_temp)) + 
+  #scale_fill_gradient2(low = "#2b8cbe", high = "#de2d26", mid = "#fec44f", midpoint = 10)
+  scale_fill_distiller(palette = "YlOrBr")
+```
+# Descreet
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = superpower) + 
+  geom_bar() +
+  #scale_fill_hue(h = c(120,300),l = 45)
+  #scale_fill_grey(start = 0, end = 0.5)
+  scale_fill_manual(values = c("Fly" = "red",
+                               "Freeze time" = "blue",
+                               "Invisibility" = "green",
+                               "Telepathy" = "yellow"))
+  #scale_fill_brewer(palette = "Pastel1") #BREWER is for categorical data
+```
+```{r}
+ggplot(chinesemeal) + 
+  aes(x = Year, colour = FoodType, y = CaloriesPerDay) + 
+  geom_line() +
+  scale_colour_brewer(palette = "Dark2")
+  #scale_colour_grey(start = 0, end = 1)
+```
+
+# Legend
+
+```{r}
+ggplot(chinesemeal) + 
+  aes(x = Year, colour = FoodType, y = CaloriesPerDay) + 
+  geom_line() + 
+  #scale_colour_hue(guide = guide_legend(ncol = 4, byrow = TRUE, reverse = TRUE))
+  scale_colour_hue(guide = guide_legend(keywidth = 5, keyheight = 3))
+```
+```{r}
+ggplot(pets) + 
+  aes(x = weight, y = age, colour = sleep) +
+  geom_point(size = 5) +
+  scale_colour_continuous(guide = guide_colourbar(reverse = TRUE, nbin = 3))
+```
+# Themes
+
+```{r}
+ggplot(pets) + 
+  aes(x = weight, y = age, colour = sleep) +
+  geom_point(size = 5) + 
+  theme_classic() #use theme helpfile, as here are too many options and elements can be customised.
+```
+```{r, eval=FALSE}
+#common used elements
+element_blank()
+element_text()
+element_rect()
+element_line()
+```
+```{r}
+ggplot(pets) + 
+  aes(x = weight, y = age, colour = sleep) +
+  geom_point(size = 5) + 
+  labs(title = "Typical Chinese Diet") + 
+  theme(title = element_text(size = 20, face = "bold", colour = "white"),
+        panel.grid = element_line(colour = "black", size = 2, linetype = "dotted"),
+        plot.background = element_rect(fill = "#F5038B"),
+        panel.background = element_rect(fill = "green"))
+```
+
+```{r}
+ggplot(scottish_exports) +
+  geom_line(aes(x = year, y = exports)) +
+  facet_wrap(~sector, scales = 'free_y')+ 
+  theme_gray() + 
+  theme(panel.grid = element_line(colour = "#5e5d5d", size = 0.2),
+        plot.background = element_rect("#c2c2c2"))
+```
+
+# Effective Plots.
+
+## Colour blindness: 
+
+* red weak
+* green weak
+* blue weak - very uncommon (<0.5% population)
+
+```{r}
+install.packages("ggthemes")
+library(ggthemes)
+ggplot(iq_scores) + 
+  aes(x = person, y = score, fill = test) + 
+  geom_col(position = "dodge") + 
+  scale_fill_colorblind()
+```
+```{r}
+install.packages("viridis")
+library(viridis)
+ggplot(iq_scores) + 
+  aes(x = person, y = test, fill = score) + 
+  geom_raster() + 
+  scale_fill_viridis(option = "magma")
+```
+
+## Other useful stuff
+
+```{r}
+ggplot(table_of_numbers) +
+  aes(x = x, y = y, label = num, color = num == 1) +
+  geom_text() +
+  theme_void() 
+```
+
+```{r}
+library(forcats)
+
+total_sales <- total_sales %>%
+  mutate(branch = fct_reorder(branch, sales))
+
+ggplot(total_sales) + 
+  aes(x = branch, y = sales, fill = branch == "Glasgow") + 
+  scale_fill_manual(values = c("grey40", "red"), guide = FALSE) + 
+  geom_col() +
+  coord_flip()
+```
+
+```{r}
+ggplot(monthly_sales) + 
+  aes(x = branch, y = sales, fill = month) + 
+  geom_col(position = "dodge") + 
+  coord_flip()
+```
+
+```{r}
+options(scipen = 999)
+monthly_sales_april <- monthly_sales %>%
+  filter(month == "April") %>%
+  mutate(branch_ordered = fct_reorder(branch, difference_from_jan))
+monthly_sales_april %>%
+  ggplot() +
+  aes(x = branch_ordered, y = difference_from_jan, fill = difference_from_jan > 0) +
+  geom_col() +
+  coord_flip() +
+  guides(fill = FALSE)
+```
+```{r}
+monthly_sales %>%
+  mutate(month = fct_relevel(month, "Jan", "Feb", "March", "April")) %>%
+  mutate(is_northern = branch %in% c("Edinburgh", "Glasgow", "Leeds", "Machester")) %>%
+  ggplot() +
+  aes(x = month, y = sales, group = branch, colour = is_northern) +
+  geom_line()
+```
+
+
+

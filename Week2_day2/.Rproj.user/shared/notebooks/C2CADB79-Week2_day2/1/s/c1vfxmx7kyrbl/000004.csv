@@ -1,2 +1,0 @@
-"0","data <- dbGetQuery(conn = my_db_connection, statement = ""SELECT * FROM employees"")"
-"0","data"

@@ -1,7 +1,0 @@
-"0","#how many died in each family"
-"0","deaths_grouped <- group_by(all_deaths, allegiances)"
-"0","deaths_summarised <- summarise(deaths_grouped,"
-"0","                               number_of_deaths = n())"
-"2","`summarise()` ungrouping output (override with `.groups` argument)
-"
-"0","deaths_summarised"

@@ -1,7 +1,0 @@
-"0","SELECT 
-  teams.name,
-  COUNT(employees.id) AS num_employees
-FROM employees FULL OUTER JOIN teams
-ON employees.team_id = teams.id
-GROUP BY teams.name 
-ORDER BY num_employees ASC NULLS FIRST"

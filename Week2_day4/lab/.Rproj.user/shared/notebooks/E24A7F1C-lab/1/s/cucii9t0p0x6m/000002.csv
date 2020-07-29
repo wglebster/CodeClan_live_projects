@@ -1,3 +1,0 @@
-"0","SELECT
-  COUNT(employee_id)
-FROM employees_committees"

@@ -1,5 +1,0 @@
-"0","tidy_orders <- messy_orders %>%"
-"0","  separate(col = order_info,"
-"0","           into = c(""order_number"", ""order_date""),"
-"0","           sep = ""/"")"
-"0","tidy_orders"

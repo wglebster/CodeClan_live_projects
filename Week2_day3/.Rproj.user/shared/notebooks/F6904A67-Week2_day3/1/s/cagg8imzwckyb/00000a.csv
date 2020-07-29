@@ -1,5 +1,0 @@
-"0","SELECT * 
-FROM employees
-WHERE country = 'Libya'
-ORDER BY salary DESC
-LIMIT 1"

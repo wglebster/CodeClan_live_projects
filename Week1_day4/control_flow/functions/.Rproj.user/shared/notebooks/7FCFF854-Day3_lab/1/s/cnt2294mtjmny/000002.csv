@@ -1,5 +1,0 @@
-"0","```r
-temperature <- c(12, 15, 14, 14, 15)
-chance_of_rain <- c(5, 90, 20, 50, 30)
-cloud_cover <- c(\"cloudy\", \"cloudy\", \"cloudy\", \"partly cloudy\", \"clear\" )
-```"

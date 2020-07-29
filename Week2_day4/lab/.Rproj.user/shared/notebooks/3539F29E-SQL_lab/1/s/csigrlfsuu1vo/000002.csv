@@ -1,6 +1,0 @@
-"0","```sql
-SELECT 
-  COUNT(id) AS number_of_employees_enrolled_in_pension
-FROM employees
-WHERE country NOT IN ('France', 'Germany') AND pension_enrol = TRUE;
-```"

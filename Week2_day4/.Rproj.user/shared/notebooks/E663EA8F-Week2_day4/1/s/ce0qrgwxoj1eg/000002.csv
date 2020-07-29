@@ -1,4 +1,0 @@
-"0","SELECT *
-FROM animals
-INNER JOIN diets ON animals.diet_id = diets.id
-WHERE diet_type = 'herbivore'"

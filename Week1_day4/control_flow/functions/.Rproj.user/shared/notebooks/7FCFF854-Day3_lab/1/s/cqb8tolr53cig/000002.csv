@@ -1,3 +1,0 @@
-"0","```r
-subset(five_day_forecast, temp <= mean_temp)
-```"
