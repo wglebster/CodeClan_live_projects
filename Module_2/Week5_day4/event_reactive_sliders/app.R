@@ -52,4 +52,4 @@ server <- function(input, output) {
             geom_point(alpha = input$alpha)
     })
 }
-shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server) % % 
