@@ -39,7 +39,7 @@ server <- function(input, output) {
     students_filtered <- eventReactive(input$update, {
         
         students_big %>%
-            filter(height <= input$max_height)
+            filter(height == input$max_height)
     })
     output$histogram <- renderPlot({
         ggplot(students_filtered()) +
@@ -52,4 +52,4 @@ server <- function(input, output) {
             geom_point(alpha = input$alpha)
     })
 }
-shinyApp(ui = ui, server = server) % % 
+shinyApp(ui = ui, server = server)

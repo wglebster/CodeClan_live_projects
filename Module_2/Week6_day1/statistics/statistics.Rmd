@@ -1,0 +1,167 @@
+---
+title: "Statistics using R"
+output: html_notebook
+---
+
+```{r}
+install.packages("prob")
+```
+```{r}
+library(prob)
+library(tidyverse)
+```
+```{r}
+s_two_dice <- rolldie(2)
+View(s_two_dice)
+nrow(s_two_dice)
+```
+```{r}
+s_two_dice <- s_two_dice %>%
+  mutate(total = X1 + X2)
+
+s_two_dice %>%
+  filter(total > 10)
+```
+```{r}
+first_die_even <- s_two_dice %>%
+  filter(X1 %% 2 == 0) %>%
+  filter(total < 10)
+first_die_even
+```
+# Counting (we need to know how many total outcomes there are)
+P(enent) = num(outcomes)/num(all_outcomes)
+
+```{r}
+s_two_dice <- rolldie(2)
+
+size_s <- nrow(s_two_dice) # [36] outcomes
+
+total_seven <- s_two_dice %>%
+  filter(X1 + X2 == 7)
+
+size_seven <- nrow(total_seven) # [6] outcomes in total that return 7.
+prob_total_seven <- size_seven/size_s # probability of this occuring is 0.1666667.
+```
+## combining odds
+
+```{r}
+s_die <- rolldie(1)
+s_coin <- tosscoin(1)
+
+s_total <- merge(s_die, s_coin)
+```
+# Permutations (specific numbers in specific order)
+
+number of permutations (nPr) = N! / (N-r)!
+4! = 24
+```{r}
+install.packages("gtools")
+library(gtools)
+```
+```{r}
+employees <- c("Alice", "Bob", "Carole", "David", "Elaine", "Fred", "Ghislaine", "Hua", "Inigo", "Hugo")
+```
+```{r}
+senior_staff <- as_tibble(permutations(n = 10,
+                             r = 3,
+                             v = employees,
+                             repeats.allowed = FALSE)
+)
+```
+```{r}
+senior_staff <- senior_staff %>%
+  rename(CEO = V1, CTO = V2, COO = V3)
+```
+What is the prob of Alice being CEO and Bob being CTO?
+```{r}
+alice_and_bob <- senior_staff %>%
+  filter(CEO == "Alice", CTO == "Bob")
+prob_alice_and_bob <- nrow(alice_and_bob)/nrow(senior_staff)
+```
+```{r}
+letter_combinations <- c("A", "B", "C", "D", "E")
+perm_letters_repeats <- as_tibble(permutations(n = 5,
+                                       r = 3,
+                                       v = letter_combinations,
+                                       repeats.allowed = TRUE))
+
+perm_letters_no_repeats <- as_tibble(permutations(n = 5,
+                                       r = 3,
+                                       v = letter_combinations,
+                                       repeats.allowed = FALSE))
+```
+# Combinations. Certain numbers, but the order does not matter.
+NCr = N!/(r!*(N-r)!)
+
+taking 5 card hand out of 52 pack: N = 52, r = 5
+```{r}
+card_draws <- choose(52,5)
+```
+```{r}
+colours <- c("red", "green", "yellow")
+three_colour_permutations <- permutations(n= 3,
+                                          r = 3,
+                                          v = colours,
+                                          repeats.allowed = FALSE)
+
+three_colour_combinations <- combinations(n = 3,
+                                          r = 3,
+                                          v = colours)
+
+```
+```{r}
+lottery_combinations <- choose(50, 6) # total combinations
+```
+```{r}
+lottery_probability <- 10 / lottery_combinations
+```
+# Probability combinations. Complement
+
+P(Ac) = 1 - P(A)
+
+probability of rolling 6 on a dice is 1/6, probability of rolling anything but 6 is 5/6.
+
+```{r}
+s_four_coins <- tosscoin(4) %>%
+  mutate(number_of_heads = as.numeric(toss1 == "H") + 
+           as.numeric(toss2 == "H") + 
+           as.numeric(toss3 == "H") + 
+           as.numeric(toss4 == "H"),
+         number_of_tails = as.numeric(toss1 == "T") +
+           as.numeric(toss2 == "T") +
+           as.numeric(toss3 == "T") +
+           as.numeric(toss4 == "T") 
+          ) %>%
+  filter(number_of_heads >= 1 & number_of_tails >= 1)
+
+```
+
+# Intersection
+Probability of two things happening at the same time.
+
+P(A & B) 
+```{r}
+rolldie(2) %>%
+  filter(X1%%2 == 0 & X2 == 5)
+```
+
+
+# Union. 
+Probabililty of A or B happening. 
+
+
+P(A or B)
+```{r}
+# probability of first die is even and second is 5.
+rolldie(2) %>%
+  filter(X1%%2 == 0 | X2 == 5) # 21 chances, ot total 36
+20/52
+```
+
+# Conditional probability
+
+P(A|B) probability of A given that B has happened = P(A intersection B)/P(B)
+
+# Independent Events.
+
+
