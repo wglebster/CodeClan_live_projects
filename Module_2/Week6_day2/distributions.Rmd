@@ -1,0 +1,241 @@
+---
+title: "Distributions"
+output: html_notebook
+---
+
+```{r}
+library(prob)
+library(tidyverse)
+library(janitor)
+library(stats)
+```
+
+```{r}
+s_three_coins <- tosscoin(3)
+s_three_coins
+```
+```{r}
+s_three_coins <- s_three_coins %>%
+  mutate(label = paste(toss1, toss2, toss3, sep = "")) %>%
+  mutate(prob = 1 / n())
+s_three_coins
+```
+```{r}
+ggplot(s_three_coins) + 
+  aes(x = label, y = prob) + 
+  geom_col()
+```
+This is an even distribution
+
+```{r}
+s_three_coins <- s_three_coins %>%
+  mutate(num_heads = rowSums(. == "H"))
+s_three_coins
+```
+```{r}
+prob_heads <- s_three_coins %>%
+  group_by(num_heads) %>%
+  summarise(prob = sum(prob))
+prob_heads
+```
+```{r}
+ggplot(prob_heads) + 
+  aes(x = num_heads, y= prob) +
+  geom_col()
+```
+#
+#
+# Bunch of missing code about coin flipping and frequency distro plot
+#
+#
+#
+```{r}
+air_con_sales <- read_csv("1_distributions_measures_of_centre/data/AirConSales.csv")
+```
+```{r}
+air_con_sales$Date <- as.Date(air_con_sales$Date, format = "%m/%d/%Y")
+air_con_sales
+```
+```{r}
+sales_freq_table <- table(air_con_sales$Units_sold)
+sales_freq_table
+```
+```{r}
+rolls <- sample(1:6, 100, replace = TRUE)
+freq <- table(rolls)
+freq
+
+rel_freq <- freq /100
+rel_freq
+```
+```{r}
+daily_sales_dist <- air_con_sales %>%
+  tabyl(Units_sold)
+daily_sales_dist
+```
+```{r}
+ggplot(daily_sales_dist) +
+  aes(x = Units_sold) + 
+  geom_histogram(bins = 20, col = "white")
+```
+
+# Mean
+
+```{r}
+air_con_sales %>%
+  summarise(mean_daily_sales = mean(Units_sold))
+```
+
+# Median
+
+```{r}
+air_con_sales %>%
+  summarise(mean_daily_sales = median(Units_sold))
+```
+
+# Mode
+
+```{r}
+# Mode function
+
+getMode <- function(data){
+  tabled_data <- table(data)
+  table_names <- names(tabled_data)
+  return( table_names[tabled_data == max(tabled_data)] )
+}
+```
+```{r}
+air_con_sales %>%
+  summarise(mode_daily_sales = getMode(Units_sold))
+```
+```{r}
+air_con_sales <- boxplot(air_con_sales$Units_sold)
+```
+
+# Unimodal & bimodal distros - distributions with different number of peaks.
+
+```{r}
+unimodal <- read_csv("1_distributions_measures_of_centre/data/unimodal.csv")
+```
+unimodal distribution
+```{r}
+ggplot(unimodal) +
+  aes(x = x) +
+  geom_histogram(bins = 20, col = "white")
+```
+bimodal dist
+```{r}
+bimodal <- read_csv("1_distributions_measures_of_centre/data/bimodal.csv")
+```
+```{r}
+ggplot(bimodal) + 
+  aes(x = x) +
+  geom_histogram(bins = 20, col = "white")
+```
+
+# Skewedness
+
+How assymetric is data.
+
+```{r}
+left_skew <- read_csv("1_distributions_measures_of_centre/data/leftskew.csv")
+ggplot(left_skew) +
+  aes(x = x) +
+  geom_histogram(bins = 20, col = "white")
+```
+```{r}
+right_skew <- read_csv("1_distributions_measures_of_centre/data/rightskew.csv")
+ggplot(right_skew) +
+  aes(x = x) +
+  geom_histogram(bins = 20, col = "white")
+```
+Skew is where the tail is - where the least data pointing to. 
+
+# 2. Distributions measures of spread
+
+```{r}
+jobs <- read_csv("2_distributions_measures_of_spread/data/TyrellCorpJobs.csv")
+
+```
+```{r}
+summary(jobs)
+```
+## Range max value - min values
+```{r}
+jobs %>%
+  group_by(Position) %>%
+  summarise(min = range(Salary)[1],
+            max = range(Salary)[2],
+            range = max - min)
+
+```
+```{r}
+ggplot(jobs) +
+  aes(x = Salary) +
+  geom_histogram(bins = 25, col = "white") + 
+  facet_wrap(~ Position)
+```
+
+# QRs & IQR
+
+IQR = Q3 - Q1
+Q2 = median
+
+```{r}
+jobs %>%
+  group_by(Position) %>%
+  summarise(Q1 = quantile(Salary, 0.25),
+            Q2 = quantile(Salary, 0.55),
+            Q3 = quantile(Salary, 0.75),
+            IQR = Q3 - Q1
+            )
+```
+```{r}
+install.packages("skimr")
+library(skimr)
+```
+```{r}
+jobs %>%
+  select(-X1) %>%
+  group_by(Position) %>%
+  skim()
+```
+
+# Variance and Standard Deviation.
+
+```{r}
+jobs %>%
+  group_by(Position) %>%
+  summarise(variance = var(Salary)) #variance values are squared
+```
+```{r}
+jobs %>%
+  group_by(Position) %>%
+  summarise(stdev = sd(Salary))
+```
+
+
+# Probability distributions - continuous is different from descreet. 
+
+## Descreet
+
+## Continuous
+
+```{r}
+punif(10.751, min = 5, max = 22) - punif(8.4, min = 5, max = 22) # what is punif?
+
+
+dunif
+```
+
+```{r}
+runif(100, 5, 22) # sample of uniform distribution, for continuous data only.
+#can use smple() for descreet values
+```
+
+# !!!!!!!!!!!!!!!!Normal distribution!!!!!!!!!
+
+```{r}
+
+```
+
