@@ -1,0 +1,254 @@
+---
+title: "Inferential Stats, Sampling & distributions"
+output: html_notebook
+---
+# Sampling
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+telco <- read_csv("1_sampling_distributions_standard_errors/data/telecomms_churn.csv")
+telco <- clean_names(telco)
+glimpse(telco)
+```
+Variables: 
+
+monthly_charges, tenure, churn
+```{r}
+summary_popn <- telco %>%
+summarise(mean_monthly_charges = mean(monthly_charges),
+          mean_tenure = mean(tenure),
+          prop_churn = mean(churn == "Yes")
+          )
+summary_popn
+```
+```{r}
+telco %>%
+  ggplot(aes(x = monthly_charges)) +
+  geom_histogram(col = "white")
+```
+monthly charges strongly bimodal
+```{r}
+telco %>%
+  ggplot(aes(x = tenure)) +
+  geom_histogram(col = "white")
+```
+not a normal distribution
+```{r}
+telco %>% 
+  ggplot(aes(x = churn)) +
+  geom_bar()
+```
+
+ABOVE EVERYTHING IS POPULATION DISTRIBUTIONS. 
+
+
+# take random sample of 200 records from telco dataset.
+
+SRS = simple random sample
+install "infer" package
+
+```{r}
+library(infer)
+```
+```{r}
+sample_200 <- telco %>%
+  rep_sample_n(size = 200, reps = 1)
+sample_200
+```
+
+Below are estimates of the telco population aka statistic or point estimates.
+
+```{r}
+summary_sample_200 <- sample_200 %>%
+  ungroup() %>%
+  summarise(mean_monthly_charges = mean(monthly_charges),
+          mean_tenure = mean(tenure),
+          prop_churn = mean(churn == "Yes")
+          )
+summary_sample_200
+  
+```
+
+Sampling error = difference between parameters and statistics
+
+```{r}
+summary_sample_200 - summary_popn
+```
+
+Repeat sampling = Resampling
+5000 resamples each or size 200.
+
+Below are sampling distributions of statistics.
+```{r}
+rep_sample_200 <- telco %>%
+  rep_sample_n(size = 200, reps = 5000) %>%
+  summarise(mean_monthly_charges = mean(monthly_charges),
+          mean_tenure = mean(tenure),
+          prop_churn = mean(churn == "Yes")
+  )
+rep_sample_200
+```
+
+Mean monthly charges sampling distribution
+
+```{r}
+mean_monthly_charges_plot <- rep_sample_200 %>%
+  ggplot(aes(x = mean_monthly_charges)) + 
+  geom_histogram(col = "white") + 
+  labs(x = "mean monthly charges from each sample")
+mean_monthly_charges_plot
+```
+
+```{r}
+tenure_sample200_plot <- rep_sample_200 %>%
+  ggplot(aes(x = mean_tenure)) + 
+  geom_histogram(col = "white") + 
+  labs(x = "mean tenure from each sample")
+tenure_sample200_plot
+```
+```{r}
+tenure_sample200_plot <- rep_sample_200 %>%
+  ggplot(aes(x = prop_churn)) + 
+  geom_histogram(col = "white") + 
+  labs(x = "Proportion of churn from each sample")
+tenure_sample200_plot
+```
+
+Central limit theorem: 
+
+The larger the amount of data and the more samples, the more normal is the distribution.
+
+Proportions need to satisfy success/failure criteria - 
+
+p = proportion of "successes" 1-p = proportion of "failures". 
+
+n * p >= 10 (number of success)
+n * (1-p) >= (number of failures)
+
+p ~ 0.01, what sample size is needed?
+
+n * 0.01 >= 10
+
+
+Rule of thumb - a sample of 30 is usually good enough.
+
+standard error = standard deviation of sample distribution. 
+
+```{r}
+#standard errors
+```
+
+
+```{r}
+std_errs <- rep_sample_200 %>%
+  summarise(
+    se_mean_monthly_charges = sd(mean_monthly_charges),
+    se_mean_tenure = sd(mean_tenure),
+    se_prop_churn = sd(prop_churn),
+  )
+std_errs
+```
+```{r}
+rep_sample_200 %>%
+  filter(mean_monthly_charges >= 60, mean_monthly_charges <= 70) %>%
+  summarise(prob = n() / nrow(rep_sample_200))
+```
+
+
+# BOOTSTRAPPING.
+```{r}
+library(janitor)
+library(tidyverse)
+```
+```{r}
+sample_200 <- read_csv("5_confidence_intervals/data/telecomms_churn_200_sample.csv")
+```
+
+```{r}
+bootstrap_resample_200 <- sample_200 %>%
+  rep_sample_n(size = 200, replace = TRUE, reps = 5000) %>%
+  summarise(mean_tenure = mean(tenure))
+bootstrap_resample_200
+
+  ggplot(bootstrap_resample_200) +
+    aes(x = mean_tenure) + 
+  geom_histogram(col = "white")
+
+
+sd(bootstrap_resample_200$mean_tenure)
+```
+
+# confidence interval
+```{r}
+ci_95 <- bootstrap_resample_200 %>%
+  summarise(mean = mean(mean_tenure),
+            lower_bound = quantile(mean_tenure, probs = 0.025),
+            upper_bound = quantile(mean_tenure, probs = 0.975)
+            )
+ci_95
+```
+
+
+### INFER : 
+- Specify,
+- Generate,
+- Calculate
+
+```{r}
+infer_resample <- sample_200 %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+
+infer_resample
+```
+```{r}
+infer_ci_95 <- infer_resample %>%
+  get_ci(level = 0.95, type = "percentile")
+infer_ci_95
+```
+```{r}
+infer_resample %>%
+  visualise() +
+  shade_confidence_interval(endpoints = infer_ci_95)
+```
+```{r}
+infer_resample_300 <- read_csv("5_confidence_intervals/data/telecomms_churn_300_sample.csv")
+```
+
+```{r}
+infer_resample_300 %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95, type = "percentile")
+
+infer_resample_300
+
+infer_resample_400 <- read_csv("5_confidence_intervals/data/telecomms_churn_400_sample.csv") %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95, type = "percentile")
+
+infer_resample_400
+
+infer_resample_500 <- read_csv("5_confidence_intervals/data/telecomms_churn_500_sample.csv") %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean") %>%
+  get_ci(level = 0.95, type = "percentile")
+
+infer_resample_500
+```
+
+
+```{r}
+
+```
+
+
+

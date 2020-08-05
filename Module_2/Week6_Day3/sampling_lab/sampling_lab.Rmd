@@ -1,0 +1,91 @@
+---
+title: "Sampling Lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+
+```{r}
+heart_data <- read_csv("data/heart.csv")
+
+```
+```{r}
+heart_data %>%
+  ggplot(aes(x = thalach)) +
+    geom_histogram()
+
+heart_data %>%
+  ggplot(aes(x = thalach)) + 
+           geom_boxplot()
+```
+```{r}
+heart_data %>%
+  ggplot(aes(x = exang)) + 
+  geom_bar()
+```
+# 4.
+```{r}
+heart_data_param_summary <- heart_data %>%
+  summarise(mean_thalach = mean(thalach),
+            prop_exang = mean(exang == "1"))
+heart_data_param_summary
+```
+# 5.
+```{r}
+library(infer)
+```
+
+```{r}
+heart_data_50_sample <- heart_data %>%
+  rep_sample_n(size = 50, reps = 1) %>%
+  ungroup() %>%
+  summarise(mean_thalach = mean(thalach),
+            prop_exang = mean(exang == "1")
+            )
+
+heart_data_50_sample
+```
+# 6.
+
+```{r}
+# order of subtraction is not important for calculation of sampling error.
+abs(heart_data_param_summary - heart_data_50_sample)
+```
+
+# 7. 
+```{r}
+rep_sample_50 <- heart_data %>%
+  rep_sample_n(size = 50, reps = 5000)
+rep_sample_50
+```
+```{r}
+rep_sample_50_means <- rep_sample_50 %>%
+  summarise(mean_thalach = mean(thalach),
+            prop_exang = mean(exang == "1")
+            )
+
+
+  ggplot(rep_sample_50_means) + 
+    aes(x = mean_thalach) + 
+  geom_histogram(col = "white") + 
+  labs(x = "mean thalach")
+#rep_sample_50_means 
+
+  ggplot(rep_sample_50_means) + 
+    aes(x = prop_exang) + 
+  geom_histogram(col = "white") + 
+  labs(x = "mean thalach")
+
+```
+
+```{r}
+
+```
+
+
+
+
