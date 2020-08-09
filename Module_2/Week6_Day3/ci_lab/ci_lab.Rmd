@@ -1,0 +1,52 @@
+---
+title: "Confidence Intervals lab"
+output: html_notebook
+---
+
+```{r}
+options(scipen = 999)
+library(tidyverse)
+library(janitor)
+```
+```{r}
+sale_price <- read_csv("data/ames.csv") %>%
+  clean_names() %>%
+  select(sale_price)
+
+sale_price
+```
+```{r}
+
+ggplot(sale_price) +
+  aes(x = sale_price) + 
+  geom_histogram(col = "white")
+```
+```{r}
+mean_sale_price <- sale_price %>%
+  summarise(mean_sale_price = mean(sale_price), median_sale_price = median(sale_price))
+mean_sale_price
+```
+```{r}
+library(infer)
+```
+
+```{r}
+sample_100 <- sale_price %>%
+  rep_sample_n(size = 100, reps = 1000, replace = TRUE)
+sample_100
+```
+```{r}
+bootstrap_sample_100 <- sample_100 %>%
+  specify(response = sale_price) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "mean") %>%
+  mutate(get_ci(level = 0.95, type = "percentile"))
+bootstrap_sample_100
+```
+```{r}
+row_100_ci <- bootstrap_sample_100 %>%
+  get_ci(level = 0.95, type = "percentile")
+row_100_ci
+```
+
+
