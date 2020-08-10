@@ -1,0 +1,324 @@
+---
+title: "Date/Time"
+output: html_notebook
+---
+
+Library to use: "lubridate" !!!
+
+
+What order does ISO standard follow? (e.g. year to second, second to year…) - YYYY-MM-DD. I.e. Years to Seconds - Largest to smallest.
+
+What is the minimum number of digits you can have in a year? Why is this? - 4 Digits in the year notation. This is to avoid the "Millenium Bug"
+
+What clock system do the times use? - UTC (Universal Coordinated Time), 24 hour clock
+
+How many time formats does ISO standard have? - hh:mm:ss.sss	or	hhmmss.sss or  hh:mm:ss	or	hhmmss or hh:mm	or	hhmm or hh	
+
+What timezone are time and dates automatically represented in? - UTC 0
+
+How are combined date-times represented? - 
+
+
+```{r}
+library(lubridate)
+```
+```{r}
+class(today())
+class(now())
+```
+```{r}
+today()
+now()
+```
+# extract dates out of strings: 
+- ymd
+- mdy
+- dmy
+```{r}
+"2019-01-19"
+ymd("2019-01-19")
+
+```
+```{r}
+"January 19th, 2019"
+mdy("January 19th, 2019")
+```
+```{r}
+"09-Jan-2019"
+dmy("09-Jan-2019")
+```
+Include times: 
+- ymd_hms
+etc
+
+
+# Task:
+Use the lubridate package to turn the following dates into dates or datetimes:
+“March 12th, 2005”
+“2018-06-23"
+“2017-04-29 11:43:02”
+“02-Sep-2002"
+“2001-01-07 7”
+“August 1st, 2019 08:13"
+```{r}
+mdy("March 12th, 2005")
+ymd("2018-06-23")
+ymd_hms("2017-04-29 11:43:02")
+dmy("02-Sep-2002")
+ymd_h("2001-01-07 7")
+mdy_hm("August 1st, 2019 08:13")
+```
+
+
+```{r}
+date_components <- tibble(id = 1:5, year = 2013 , month = 3:7, day = 1, hour = 5, minute = id^2 + month)
+date_components
+```
+```{r}
+library(dplyr)
+```
+```{r}
+date_components %>%
+  mutate(date_combo = make_datetime(year, month, day, hour, minute))
+date_components
+```
+```{r}
+install.packages("nycflights13")
+library(nycflights13)
+```
+
+```{r}
+nycflights13::flights
+```
+```{r}
+flights %>%
+  mutate(departure = make_datetime(year, month, day, hour, minute))
+```
+```{r}
+as_datetime(today())
+as_date(now())
+```
+```{r}
+last_month <- "2019-07-01 04:23:12"
+as_datetime(last_month) # or
+ymd_hms(last_month)
+date(last_month)
+```
+
+```{r}
+our_datetime <- ymd_hms("2019-06-09 21:04:56")
+our_datetime
+```
+extraction functions, yday starts counting from Sunday.
+```{r}
+year(our_datetime)
+month(our_datetime, label = TRUE, abbr = FALSE)
+day(our_datetime)
+mday(our_datetime)
+yday(our_datetime)
+wday(our_datetime, label = TRUE, abbr = FALSE, week_start = 1)
+hour(our_datetime)
+minute(our_datetime)
+second(our_datetime)
+```
+
+# timespans
+
+* period:
+
+```{r}
+as.period(today() - ymd(19830529))
+```
+```{r}
+today() - years(1)
+today() - days(100)
+now() - hours(2)
+```
+```{r}
+xsmas <- c("25-12-2020")
+xsmas <- dmy(xsmas)
+xsmas - today()
+xsmas + months(6)
+xsmas - weeks(2)
+xsmas + hours(36)
+xsmas + hours(24)
+
+```
+
+* duration:
+
+as.duration() or dyear or similar
+
+```{r}
+ymd(20200110) + years(1) # context dependent (daylight savings times, leap years seconds), i.e 365 days later
+ymd(20200110) + dyears(1) # not context dependent - i.e. same day next year
+```
+
+* interval: 
+
+```{r}
+my_interval <- interval(today(), ymd(20190621))
+new_interval <- interval(today(), ymd(20190619))
+
+int_overlaps(my_interval, new_interval)
+setdiff(my_interval, new_interval)
+```
+
+# timezones
+
+```{r}
+Sys.timezone()
+OlsonNames()
+```
+
+```{r}
+ymd_hms("2020-06-02 04:00:00", tz = "Pacific/Auckland")
+```
+
+```{r}
+with_tz(now(), tzone = "Pacific/Auckland")
+```
+
+# task:
+
+Let’s say a plane leaves Sydney Australia at 2.15pm 7-August-2018, and arrives at 5.40am on the 8-August-2018 in London.
+
+Create these two dates with the appropriate time zones.
+Work out how long the duration between take off and landing is.
+
+If you left London at 6.20 am on the 10-August-2018, and the total flight time including stop overs was 28 hours and 46 minutes. What time would you arrive in Sydney, Australia?
+
+```{r}
+depart_sydney <- ymd_hm("2018-08-07 14:15", tz = "Australia/Sydney")
+arrive_london <- ymd_hm("2018-08-08 05:40", tz = "Europe/London")
+flight_duration <- arrive_london - depart_sydney
+flight_duration <- as.period(flight_duration)
+
+dep_london <- ymd_hm("2018-08-10 06:20", tz = "Europe/London")
+duration <- hm("28:46")
+arr_sydney <- dep_london + duration
+arr_sydney <- with_tz(arr_sydney, tzone = "Australia/Sydney")
+
+
+flight_duration
+arr_sydney
+```
+
+# Time series analysis intro.
+```{r}
+install.packages("tsibble")
+install.packages("tsibbledata")
+install.packages("feasts")
+install.packages("fable")
+```
+```{r}
+library(tsibble)
+library(tsibbledata)
+library(feasts)
+library(fable)
+library(tidyverse)
+```
+
+```{r}
+dim(vic_elec)
+```
+filter where data was collected in 2012
+```{r}
+vic_elec %>%
+  filter_index("2012")
+```
+grouping observations
+```{r}
+vic_year <- vic_elec %>%
+  mutate(year = lubridate::year(Date))
+vic_year
+```
+```{r}
+vic_year %>%
+  index_by(year)%>%
+  summarise(mean_temp = mean(Temperature))
+```
+
+```{r}
+holidays <- vic_elec %>%
+  filter(Holiday == FALSE)
+```
+```{r}
+ggplot(holidays) + 
+  aes(x = Time, y = Temperature) +
+  aezgeom_line()
+```
+
+* aggregating
+
+```{r}
+# aggregate by date
+elec_date <- vic_elec %>%
+  index_by(date = ~ as_date(.)) %>%
+  summarise(temp_mean = mean(Temperature, na.rm = TRUE))
+elec_date
+```
+
+```{r}
+ggplot(elec_date) + 
+  aes(x = date, y = temp_mean) + 
+  geom_line()
+```
+```{r}
+elec_month <- vic_elec %>%
+  index_by(date = ~ month(., label = TRUE)) %>%
+  summarise(temp_mean = mean(Temperature, na.rm = TRUE))
+```
+```{r}
+ggplot(elec_month) +
+  aes(x = date, y = temp_mean) +
+  geom_line(group = 1) +
+  geom_point()
+```
+* Rolling windows
+
+```{r}
+elec_rolling <- vic_elec %>% 
+  mutate(temp_ma = slide_dbl(Temperature, 
+                             ~ mean(., na.rm = TRUE), 
+                             .size = 1000)
+         )
+```
+```{r}
+ggplot(elec_rolling) + 
+  geom_line(aes(x = Date, y = Temperature), color = "grey") +
+  geom_line(aes(x = Date, y = temp_ma),color = "red")
+```
+```{r}
+#feasts
+holidays <- tourism %>%
+  filter(Purpose %in% c("Holiday","Business")) %>%
+  group_by(State) %>%
+  summarise(Trips = sum(Trips))
+holidays
+
+```
+```{r}
+holidays %>%
+  autoplot(Trips) + 
+  xlab("year")
+```
+```{r}
+holidays %>%
+  filter(State %in% c("Queensland", "New South Wales", "Victoria")) %>%
+  gg_season(Trips)
+```
+
+```{r}
+holidays %>%
+  filter(State %in% c("Queensland", "New South Wales", "Victoria")) %>%
+  gg_subseries(Trips)
+```
+
+
+
+
+
+
+
+
