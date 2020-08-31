@@ -1,0 +1,315 @@
+---
+title: "Time series forecasting & Spatial data mapping"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(tsibble)
+library(tsibbledata)
+library(fable)
+```
+```{r}
+aus_production
+```
+```{r}
+beer_data <- aus_production %>%
+  select(Quarter, Beer)
+
+beer_data %>%
+  autoplot()
+```
+# MOdels: 
+
+```{r}
+model_fit <- beer_data %>%
+  model(
+    snaive_model = SNAIVE(Beer),
+    mean_model = MEAN(Beer),
+    arima_model = ARIMA(Beer)
+  )
+
+model_fit
+```
+
+```{r}
+our_forecast <- model_fit %>%
+  forecast(h = 12) # 12 means 12 periods, which is 3 years, as we have 4 quarterly data points per year
+
+our_forecast %>%
+  autoplot(beer_data) #level = NULL to remove level
+```
+
+#Task:
+
+Calculate a forecast for the next 10 years, and plot it. What do you see? Write a description.
+
+```{r}
+our_forecast_40 <- model_fit %>%
+  forecast(h = 40)
+
+our_forecast_40 %>%
+  filter(.model == "snaive_model") %>%
+  autoplot(beer_data)
+
+our_forecast_40 %>%
+  filter(.model == "mean_model") %>%
+  autoplot(beer_data)
+
+our_forecast_40 %>%
+  filter(.model == "arima_model") %>%
+  autoplot(beer_data)
+```
+# accuracy scores.
+
+```{r}
+#80/20 split - 80 training, 20 prediction.
+#16 years of training could predict 4 years into the future.
+
+beer_training <- beer_data %>%
+  filter_index("1990 Q1" ~ "2006 Q4")
+
+#fit model on training data
+
+fit_training <- beer_training %>%
+  model(arima_model = ARIMA(Beer),
+        snaive_model = SNAIVE(Beer))
+
+#reate forecast based on the training data
+
+forecast_training <- fit_training %>%
+  forecast(h = 12)
+```
+```{r}
+forecast_training %>%
+  autoplot(beer_training, level = NULL) + 
+  autolayer(filter_index(beer_data, "2007 Q1" ~ .), color = "grey")
+```
+# accuracy scores
+
+```{r}
+accuracy_model <- accuracy(forecast_training, beer_data)
+
+accuracy_model %>%
+  arrange(RMSE)
+```
+
+----
+
+# Spatial data 
+
+(Plotting maps etc)
+```{r}
+#install.packages("sf")
+```
+```{r}
+library(sf)
+```
+```{r}
+north_carolina <- st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+```
+```{r}
+class(north_carolina)
+```
+```{r}
+view(north_carolina)
+```
+```{r}
+attr(north_carolina, "sf_column")
+```
+```{r}
+north_carolina_geometry <- st_geometry(north_carolina)
+north_carolina_geometry
+```
+
+```{r}
+plot(north_carolina)
+```
+```{r}
+plot(north_carolina[1])
+```
+
+```{r}
+plot(north_carolina[1,1])
+```
+```{r}
+ggplot(north_carolina, aes(fill = AREA)) +
+  geom_sf() +
+  theme_bw()
+```
+```{r}
+install.packages("rnaturalearth")
+install.packages("rnaturalearthdata")
+install.packages("rgeos")
+```
+```{r}
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rgeos)
+```
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+```{r}
+View(world)
+```
+```{r}
+ggplot(world) +
+  geom_sf(colour = "black", fill = "green")
+```
+```{r}
+options(scipen = 999)
+ggplot(world) + 
+  geom_sf(aes(fill = pop_est)) +
+  scale_fill_viridis_c(option = "plasma", trans = "sqrt")
+  
+```
+
+```{r}
+names(world)
+```
+
+```{r}
+ggplot(world) + 
+  geom_sf(aes(fill = gdp_md_est)) +
+  scale_fill_viridis_c(option = "plasma", trans = "sqrt")
+```
+```{r}
+country_italy <- world %>%
+  filter(name == "Italy")
+```
+```{r}
+ggplot(country_italy) +
+  geom_sf()
+```
+```{r}
+country_transformed <- st_transform(country_italy, 3003)
+```
+```{r}
+grid <- st_make_grid(country_transformed, cellsize = 50000, what = "centers")
+plot(grid)
+```
+```{r}
+country_line <- st_cast(country_transformed, "MULTILINESTRING")
+```
+```{r}
+dist <- st_distance(country_line, grid)
+dist
+```
+```{r}
+distance_plot <- data.frame(dist = as.vector(dist)/1000,
+                            st_coordinates(grid))
+distance_plot
+```
+```{r}
+ggplot(distance_plot) +
+  aes(X, Y, fill = dist) + 
+  geom_tile() +
+  theme_void()
+```
+
+```{r}
+#Argentina - map by distance to the country border
+country_arg <- world %>%
+  filter(name == "Argentina")
+ggplot(country_arg) +
+  geom_sf()
+```
+```{r}
+country_transformed <- st_transform(country_arg, 22184)
+grid <- st_make_grid(country_transformed, cellsize = 10000, what = "centers")
+plot(grid)
+```
+```{r}
+country_line <- st_cast(country_transformed, "MULTILINESTRING")
+dist <- st_distance(country_line, grid)
+dist
+```
+```{r}
+distance_plot <- data.frame(dist = as.vector(dist)/1000,
+                            st_coordinates(grid))
+distance_plot
+```
+```{r}
+ggplot(distance_plot) +
+  aes(X, Y, fill = dist) + 
+  geom_tile() +
+  theme_void()
+```
+
+```{r}
+ggplot(data = world) +
+    geom_sf(aes()) +
+    coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)
+```
+```{r}
+world_centers <- st_centroid(world$geometry)
+world_coordinates <- st_coordinates(world_centers)
+world_points <- cbind(world, world_coordinates)
+
+head(world_points)
+```
+
+```{r}
+ggplot(data = world) +
+    geom_sf(aes()) +
+  geom_text(data = world_points, aes(x = X, y = Y, label = name), check_overlap = TRUE) + 
+    coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)
+```
+# Leaflet package.
+
+```{r}
+library(leaflet)
+```
+```{r}
+leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = 174.768, lat = -36.852, popup = "Birth of R")
+```
+```{r}
+library(jsonlite)
+library(RCurl)
+```
+
+```{r}
+colarado_data_url <- paste0("https://data.colorado.gov/resource/j5pc-4t32.json?","&county=BOULDER")
+```
+```{r}
+water_data <- getURL(URLencode(colarado_data_url))
+water_data_df <- fromJSON(water_data) %>%
+  jsonlite::flatten(recursive = TRUE)
+water_data_df
+```
+```{r}
+water_data_df_clean <- water_data_df %>%
+  mutate_at(vars(amount, location.latitude, location.longitude), as.numeric) %>%
+  filter(!is.na(location.latitude))
+```
+```{r}
+leaflet(water_data_df_clean) %>%
+  addTiles() %>%
+  addCircleMarkers(lng = ~ location.longitude, lat = ~ location.latitude, radius = ~ amount/1000, weight = 1)
+```
+```{r}
+leaflet(water_data_df_clean) %>%
+  addTiles() %>%
+  addMarkers(lng = ~ location.longitude, lat = ~ location.latitude, clusterOptions = markerClusterOptions())
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

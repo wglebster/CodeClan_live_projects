@@ -1,0 +1,114 @@
+---
+title: "Synthetic data (fake/test data)"
+output: html_notebook
+---
+```{r}
+install.packages("synthpop")
+```
+
+```{r}
+library(synthpop)
+library(CodeClanData)
+library(tidyverse)
+```
+```{r}
+salary
+```
+```{r}
+salaries <- salary %>%
+  dplyr::select(job_area, salary)
+
+salaries %>%
+  ggplot(aes(x = job_area, y = salary))+ 
+  geom_boxplot()
+```
+
+# Synthpop - to mimic an existing dataset.
+
+```{r}
+syn_sal <- syn(salaries)
+```
+```{r}
+syn_sal
+```
+```{r}
+syn_sal_data <- syn_sal$syn
+summary(syn_sal_data)
+```
+```{r}
+summary(salaries)
+```
+
+```{r}
+compare(syn_sal, salaries)
+```
+```{r}
+library(lubridate)
+```
+
+```{r}
+syn_sal_data %>%
+  ggplot(aes(x = job_area, y = salary)) +
+  geom_boxplot()
+```
+
+* task.
+
+```{r}
+library(lubridate)
+```
+```{r}
+IBM_stock_price_open <- IBM_stock_price %>%
+                            dplyr::select(date, open) %>%
+                            dplyr::mutate(date = dmy(date))
+```
+```{r}
+syn_IBM_stock_price_open <- syn(IBM_stock_price_open)
+```
+```{r}
+compare(syn_IBM_stock_price_open, IBM_stock_price_open)
+```
+```{r}
+IBM_stock_price_open %>%
+  ggplot(aes(x = date, y = open)) +
+  geom_line()
+```
+# NB! DO NOT sythesize dates with replacement!!! Or any categories for that matter. use visit.sequence() function to specify which variable to synthesize.
+
+```{r}
+syn_IBM_stock_price_open$syn %>%
+  ggplot(aes(x = date, y = open)) +
+  geom_line()
+```
+```{r}
+summary(IBM_stock_price_open)
+```
+```{r}
+summary(syn_IBM_stock_price_open)
+```
+
+* making rules for synth data
+```{r}
+rules_shetland <- list(job_area = "location == 'Shetland'")
+rvalues_shetland <- list(job_area = "Legal")
+
+syn_sal_data_rule <- syn(salary, visit.sequence = c("location", "salary", "job_area"), rules = rules_shetland, rvalues = rvalues_shetland)
+```
+```{r}
+syn_sal_data_rule$syn %>%
+  filter(location == "Shetland") %>%
+  group_by(job_area) %>%
+  summarise(n())
+```
+
+# Create a dataset from Scratch.
+
+website: Mockaroo.
+
+
+
+
+
+
+
+
