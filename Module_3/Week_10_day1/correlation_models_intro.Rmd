@@ -3,6 +3,7 @@ title: "Correlation, linerar_models, RESGRESSION_intro"
 output: html_notebook
 ---
 # Correlation
+## !does not imply causation!
 ```{r}
 library(tidyverse)
 library(janitor)
@@ -283,7 +284,7 @@ In order to be reliable, p - values have o be "normal".
 autoplot(model)
 ```
 
-Residuals vs Fitted - by how much the line missed each data point. Want to see them scattered near zero (evenly yspread above and below zero)
+Residuals vs Fitted - by how much the line missed each data point. Want to see them scattered near zero (evenly spread above and below zero)
 
 Normal Q-Q - lets to see if points are normally distrubuted - points should be close to line
 

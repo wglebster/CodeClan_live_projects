@@ -1,0 +1,231 @@
+---
+title: "Machine Learning"
+output: html_notebook
+---
+
+Regression is a ML problem that attempts to predict a continuous variable.
+
+Classification - for categorical variables.
+
+-----
+
+# Variable Engineering
+
+aka Feature engineering
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+grades <- read_csv("data/grades.csv")
+#View(grades)
+summary(grades)
+```
+
+```{r}
+grades <- grades %>%
+  mutate(take_home = ifelse(is.na(take_home), 
+                            mean(take_home, na.rm = TRUE), 
+                            take_home))%>%
+  mutate(final = ifelse(is.na(final),
+                        mean(final, na.rm = TRUE),
+                        final))
+
+summary(grades)
+```
+
+create dummy variables, aka ONE HOT ENCODING.
+```{r}
+grades %>%
+  distinct(subject)
+
+grades_subject_dummy <- grades %>%
+  mutate(subject_engl = ifelse(subject == "english", 1, 0)) %>%
+  mutate(subject_phys = ifelse(subject == "physics", 1, 0)) %>%
+  mutate(subject_math = ifelse(subject == "maths", 1, 0)) %>%
+  mutate(subject_fren = ifelse(subject == "french", 1, 0)) %>%
+  mutate(subject_biol = ifelse(subject == "biology", 1, 0)) %>%
+  select(-subject)
+
+grades_subject_dummy
+```
+Above is a lot of manual work, but the package "fastDummies" automates the process of onehot encoding.
+```{r}
+library(fastDummies)
+```
+```{r}
+grades_subject_dummy2 <- grades %>%
+  dummy_cols(select_columns = "subject", 
+             remove_first_dummy = TRUE,
+             remove_selected_columns = TRUE)
+
+grades_subject_dummy2
+```
+
+```{r}
+grades_final_dummy <- grades %>%
+  mutate(grade_a = ifelse(final>=70, 1, 0)) %>%
+  mutate(grade_b = ifelse(final>=60 & final<70, 1, 0)) %>%
+  mutate(grade_c = ifelse(final>=50 & final<60, 1, 0)) %>%
+  mutate(grade_f = ifelse(final>=50, 1, 0)) %>%
+  select(-final)
+
+grades_final_dummy
+```
+
+generate categorical variables from continuous. putting continuous variables into bins.
+
+```{r}
+grades_final_dummy2 <- grades %>%
+  mutate(final_score = cut(final, breaks = c(0, 50, 60, 70, Inf), 
+                           labels = c("F", "C", "B", "A"),
+                           right = FALSE))%>%
+  dummy_cols(select_columns = "final_score", remove_first_dummy = TRUE, remove_selected_columns = TRUE)
+
+grades_final_dummy2
+```
+
+# Raw vs derived data(feature)
+
+standartization of continuous variables is good, aka z-score scaling. Particularly good for Clustering models.
+
+```{r}
+#z-score scaling using scale()
+
+grades %>%
+  mutate(assignment = scale(assignment))
+```
+
+# MULTIPLE REGRESSION:
+
+response variable (what we trying to predict): volume of traffic on rail trail
+```{r}
+library(mosaicData)
+library(ggiraphExtra)
+library(GGally)
+```
+```{r}
+glimpse(RailTrail)
+```
+```{r}
+RailTrail_clean <- RailTrail %>%
+  mutate(
+    spring = ifelse(spring == 1, TRUE, FALSE),
+    summer = ifelse(summer == 1, TRUE, FALSE),
+    fall = ifelse(fall == 1, TRUE, FALSE)
+  )
+```
+```{r}
+summary(RailTrail_clean)
+```
+```{r}
+RailTrail_clean %>%
+  ggplot(aes(x = volume, y = dayType))+ 
+  geom_point()
+```
+```{r}
+RailTrail_trim <- RailTrail_clean %>%
+  select(-c("hightemp", "lowtemp", "fall", "weekday"))
+RailTrail_trim
+```
+```{r}
+ggpairs(RailTrail_trim) 
+```
+```{r}
+model <- lm(volume ~ avgtemp, data = RailTrail_trim)
+
+par(mfrow = c(2,2))
+plot(model)
+```
+```{r}
+summary(model)
+```
+"Average error" in context of the amount of users
+```{r}
+RailTrail_trim %>%
+  ggplot(aes(y = volume)) +
+  geom_boxplot()
+```
+
+add a categorical predictor:
+
+```{r}
+RailTrail_trim %>%
+  ggplot(aes(x = dayType, y = volume))+
+  geom_boxplot()
+```
+
+```{r}
+model2 <- lm(volume ~ avgtemp + dayType, data = RailTrail_trim)
+
+summary(model2)
+```
+
+regression diagnostics
+
+```{r}
+par(mfrow = c(2,2))
+plot(model2)
+```
+```{r}
+model3 <- lm(volume ~ avgtemp + dayType + summer, data = RailTrail_trim)
+
+summary(model3)
+```
+```{r}
+par(mfrow = c(2,2))
+plot(model3)
+```
+
+# interaction of variables
+
+avgTemperature:Weekday - to determine if avgtemp varies if it is weekday
+```{r}
+model4 <- lm(volume ~ avgtemp + dayType + avgtemp:dayType, data = RailTrail_trim)
+
+summary(model4)
+```
+```{r}
+RailTrail_trim %>%
+  ggplot(aes(x = cloudcover, y = volume))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE)
+```
+```{r}
+model5 <- lm(volume ~ avgtemp+dayType+cloudcover, data = RailTrail_trim)
+summary(model5)
+```
+```{r}
+par(mfrow = c(2,2))
+plot(model5)
+```
+
+running a model with ALL THE VARIABLES
+
+```{r}
+model_cheat <- lm(volume ~ ., data = RailTrail_trim)
+
+summary(model_cheat)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
