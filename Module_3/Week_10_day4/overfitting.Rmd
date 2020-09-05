@@ -1,0 +1,298 @@
+---
+title: "Automated model building/testing"
+output: html_notebook
+---
+
+Data is a combination of patterns (trends) and noise(variance/residuals)
+***Point of statistical modelling is to find the pattern***
+
+```{r}
+library(CodeClanData)
+library(tidyverse)
+```
+```{r}
+savings
+```
+
+Overfitting model
+
+```{r}
+model_overfit <- lm(savings ~ ., data = savings)
+```
+
+Well fitted model
+
+```{r}
+model_wellfit <- lm(savings ~ salary + age + retired , data = savings)
+```
+
+Under fitted model
+
+```{r}
+model_underfit <- lm(savings ~ salary, data = savings)
+```
+
+# Parsimonious(simple) measures of goodness-of-fit.
+
+* Adjusted R-squared - larger value is better
+
+* AIC - smaller values are better
+
+* BIC - smaller values are better (this tends to be the most parsimonious)
+
+measure = goodness of fit +/- parameter penalty
+
+
+
+ Analysis of model_overfit below: 
+```{r}
+summary(model_overfit)
+```
+```{r}
+summary(model_overfit)$adj.r.squared
+```
+```{r}
+AIC(model_overfit)
+BIC(model_overfit)
+```
+```{r}
+library(broom)
+```
+```{r}
+glance(model_overfit)
+```
+
+
+Analysis of model_wellfit below:
+```{r}
+summary(model_wellfit)
+```
+```{r}
+summary(model_wellfit)$adj.r.squared
+```
+```{r}
+AIC(model_wellfit)
+BIC(model_wellfit)
+```
+```{r}
+glance(model_wellfit)
+```
+
+
+Analysis of model_underfit below: 
+```{r}
+summary(model_underfit)
+```
+
+```{r}
+summary(model_underfit)$adj.r.squared
+```
+
+```{r}
+AIC(model_underfit)
+BIC(model_underfit)
+```
+```{r}
+glance(model_underfit)
+```
+
+### Test & Train
+* dummy excersise
+```{r}
+#find the size of data
+n_data <- nrow(students_big) #912 rows
+test_index <- sample(1:n_data, size = n_data*0.1)
+
+test <- slice(students_big, test_index)
+train <- slice(students_big, -test_index)
+```
+
+train data
+```{r}
+model <- lm(height ~ arm_span, data = train)
+```
+
+predict test data
+```{r}
+predictions <- predict(model, newdata = test)
+```
+
+check the difference
+```{r}
+median(abs(predictions - test$height))
+```
+
+
+* savings data test & train excersize 
+
+** Fitting model & testing
+
+```{r}
+#overfitted
+over_n_data <- nrow(savings) #1200
+over_test_index <- sample(1:over_n_data, size = over_n_data*0.1)
+
+test_over <- slice(savings, over_test_index)
+train_over <- slice(savings, -over_test_index)
+#underfitted
+under_n_data <- nrow(savings)
+under_test_index <- sample(1:under_n_data, size = under_n_data*0.1)
+
+test_under <- slice(savings, under_test_index)
+train_under <- slice(savings, -under_test_index)
+#wellfitted
+well_n_data <- nrow(savings)
+well_test_index <- sample(1:well_n_data, size = well_n_data*0.1)
+
+test_well <- slice(savings, well_test_index)
+train_well <- slice(savings, -well_test_index)
+```
+train
+```{r}
+model_over <- lm(savings ~ ., data = train_over)
+model_under <- lm(savings ~ salary, data = train_under)
+model_well <- lm(savings ~ salary + age + retired, data = train_well)
+```
+predict
+```{r}
+predict_over <- predict(model_over, data = test_over)
+predict_under <- predict(model_under, data = test_under)
+predict_well <- predict(model_well, data = test_well)
+```
+
+check difference
+```{r}
+#overfitted
+median(abs(predict_over - test_over$savings))
+#underfitted
+median(abs(predict_under - test_under$savings))
+#wellfitted
+median(abs(predict_well - test_well$savings))
+```
+
+# K-fold cross validation
+
+(harnesses both pasimonious and test/train benefits)
+
+usually select 10-folks.
+
+disadvantage: slow to run
+
+```{r}
+library(caret)
+
+#cross validation 10 fold
+cv_10_fold <- trainControl(method = "cv", 
+                           number = 10, 
+                           savePredictions = TRUE)
+
+model<- train(savings ~ ., data = savings, trControl = cv_10_fold, method = "lm")
+#all models are contained in model object
+```
+```{r}
+model$pred
+```
+```{r}
+model$resample
+#MAE is median absolute error
+```
+```{r}
+mean(model$resample$RMSE)
+mean(model$resample$Rsquared)
+```
+
+```{r}
+well_fitted_10_fold <- trainControl(method = "cv", 
+                           number = 10, 
+                           savePredictions = TRUE)
+
+well_fitted_10_fold_model<- train(savings ~ salary + age + retired, data = savings, trControl = well_fitted_10_fold, method = "lm")
+```
+```{r}
+mean(well_fitted_10_fold_model$resample$RMSE)
+mean(well_fitted_10_fold_model$resample$Rsquared)
+```
+```{r}
+#instead of GGiraphe
+library(mosaic)
+plotModel(model_well)
+```
+
+### Forward selection - incrementally increasing complexity of a model
+### Backward selection - start with overfitted model, trying to find what features decrease r-square the lest.
+
+
+#Best subset selection - theoretically the best way to do it. 
+drawback: slow
+
+available packages: leaps & GLMmulti
+
+```{r}
+library(leaps)
+```
+```{r}
+insurance
+```
+```{r}
+#need to establish how many variables and define it in nvmax
+reg_subsets_forward <- regsubsets(charges ~ . -sex, data = insurance, nvmax = 8, method = "forward" )
+
+plot(reg_subsets_forward, scale = "bic") #adjr2 = adjusted r-sq value, "bic"
+summary(reg_subsets_forward)
+```
+
+```{r}
+reg_subsets_backward <- regsubsets(charges ~ . -sex, data = insurance,nvmax = 8, method = "backward")
+
+plot(reg_subsets_backward, scale = "adjr2")
+```
+```{r}
+reg_subsets_exhaustive<-regsubsets(charges ~ . -sex, data = insurance,nvmax = 8, method = "exhaustive")
+plot(reg_subsets_exhaustive, scale = "adjr2")
+```
+
+## Deciding between models: 
+
+```{r}
+model_with_region <- lm(charges ~ age, bmi, children, smoker, region, data = insurance)
+model_without_region <- lm(charges ~ age, bmi, children, smoker, data = insurance)
+anova(model_with_region, model_without_region)
+```
+
+# How to decide between models????
+
+1. Parsimonious measure of googness of fit
+
+  * AIC
+
+  * BIC
+
+  * Adj - R-sq (higher value better)
+
+2. Test/Train
+
+3. K-fold cross validation
+
+4. ANOVA p-values (under 0.05/0.01) & Residual Errors (low)
+
+5. Diagnostic plots
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

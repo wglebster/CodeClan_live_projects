@@ -1,0 +1,272 @@
+---
+title: "Logs and undoing logs / Variable transformations"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+
+# LOG 
+
+followin can be ugsed to find the power.
+if base is not passed into the function, it will use the "e" number 
+6^4 = 1296 (6 to power of 4 is 1296)
+```{r}
+log(x = 1296, base = 6)
+```
+10^-1 = 0.1
+```{r}
+log(0.1, base = 10)
+```
+8^6.1 = 322737.121092
+
+```{r}
+log(x = 322737.121092, base = 8)
+```
+
+```{r}
+exponential <- function(x, a, b){
+  return(a * (b ** x))
+}
+
+data <- tibble(
+  x = seq(-3, 3, 0.1),
+  y1 = exponential(x, a = 1, b = 3),
+  y2 = exponential(x, a = 1, b = 4),
+  y3 = exponential(x, a = 1, b = 5),
+  y4 = exponential(x, a = 1, b = 1/3),
+  y5 = exponential(x, a = 1, b = 1/4),
+  y6 = exponential(x, a = 1, b = 1/5)
+)
+
+exp_plot <- ggplot(data, aes(x = x)) +
+  geom_line(aes(y = y1), col = "red") +
+  geom_line(aes(y = y2), col = "black") +
+  geom_line(aes(y = y3), col = "blue") +
+  geom_line(aes(y = y4), col = "red", linetype = "dashed") +
+  geom_line(aes(y = y5), col = "black", linetype = "dashed") +
+  geom_line(aes(y = y6), col = "blue", linetype = "dashed") +
+  geom_vline(xintercept = 0) +
+  ylab("y") 
+
+exp_plot
+```
+
+# Undoing LOG / EXP (these two functions are inverse)
+
+```{r}
+data <- tibble(
+  x = seq(-4, 4, 0.005),
+  y_exp = exponential(x, a = 1, b = 2),
+  y_log = log(x, base = 2)
+)
+
+```
+```{r}
+ggplot(data, aes(x = x)) +
+  geom_line(aes(y = y_exp), col = "red") +
+  geom_line(aes(y = y_log), col = "red", linetype = "dashed") +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  coord_fixed() +
+  ylim(c(-4, 4)) +
+  ylab("y")
+```
+
+```{r}
+x <- log(9.44)
+x
+#undo log of x
+exp(x)
+```
+```{r}
+x1 <- exp(5.8)
+x1
+#undo exp of x1
+log(x1)
+```
+
+Use R to get x in the expression y=6=log10(x).
+
+```{r}
+x <- 10**6 # ** is the same operator as ^
+x
+log(x, base = 10)
+```
+
+# Variable TRANSFORMATIONS
+
+```{r}
+income <- read_csv("data/income_per_person_gdppercapita_ppp_inflation_adjusted.csv") %>%
+    clean_names()
+
+life <- read_csv("data/life_expectancy_years.csv") %>%
+          clean_names()
+
+head(income)
+head(life)
+```
+```{r}
+income_life <- income %>%
+  select(country, x2018) %>%
+  rename(income_2018 = x2018) %>%
+  full_join(life, by = "country") %>%
+  select(country, income_2018, x2018) %>%
+  rename(life_2018 = x2018) %>%
+  na.omit() # drop any rows where don't have both income and life exp. info
+```
+```{r}
+ggplot(income_life, aes(x = income_2018, life_2018)) +
+  geom_point()
+```
+```{r}
+library(modelr)
+
+#fit model
+fit <- lm(life_2018 ~ income_2018, data = income_life)
+summary(fit)
+```
+
+```{r}
+#add fit into dataframe
+income_life_model <- income_life %>%
+                    add_predictions(fit) %>%
+                    add_residuals(fit, var = "resid")
+```
+
+```{r}
+# plot the linear model
+ggplot(income_life_model) +
+  geom_point(aes(x = income_2018, y = life_2018)) +
+  ylim(c(50,100)) +
+  geom_line(aes(x = income_2018, y = pred), col = "red") #plot regression line
+```
+
+```{r}
+# plot the residuals
+ggplot(income_life_model) +
+  geom_point(aes(x = income_2018, y = resid)) +
+  geom_smooth(aes(x = income_2018, y = resid), method = "loess", col = "red", se = FALSE) + #plot regression line
+  geom_hline(yintercept = 0, linetype="dashed")
+```
+
+```{r}
+#fit model
+fit <- lm(log(life_2018) ~ income_2018, data = income_life)
+summary(fit)
+```
+
+```{r}
+#add fit into dataframe
+income_life_model <- income_life %>%
+                    add_predictions(fit) %>%
+                    add_residuals(fit, var = "resid")
+
+# plot the linear model
+ggplot(income_life_model) +
+  geom_point(aes(x = income_2018, y = log(life_2018))) +
+  geom_line(aes(x = income_2018, y = pred), col = "red") #plot regression line
+```
+
+```{r}
+# plot the residuals
+ggplot(income_life_model) +
+  geom_point(aes(x = income_2018, y = resid)) +
+  geom_smooth(aes(x = income_2018, y = resid), method = "loess", col = "red", se = FALSE) + 
+#plot regression line
+  geom_hline(yintercept = 0, linetype="dashed")
+```
+
+```{r}
+library(broom)
+```
+```{r}
+# linear-log
+fit <- lm(life_2018 ~ log(income_2018), data = income_life)
+
+# y = a + b * log(x)
+
+# get coeffs from model
+intercept <- tidy(fit) %>%
+            filter(term == "(Intercept)") %>%
+            pull(estimate)
+
+gradient <- tidy(fit) %>%
+            filter(term == "log(income_2018)") %>%
+            pull(estimate)
+
+# convert to a and b. No conversion needed in this model
+a <- intercept
+b <- gradient
+
+#fit transformation
+fitted <- tibble(fit_x = seq(min(income_life$income_2018), max(income_life$income_2018), by = 0.1)) %>% # get range of x values for fit
+          mutate(fitted_y_linlog = a + b * log(fit_x)) # insert a and b into untransformed equation
+
+# plot
+plot <- ggplot() +
+  geom_point(data = income_life_model, aes(x = income_2018, y = life_2018)) +
+  geom_line(data = fitted, aes(x = fit_x, y = fitted_y_linlog), col = "red") 
+
+plot
+```
+```{r}
+#log-log
+fit <- lm(log(life_2018) ~ log(income_2018), data = income_life)
+
+# y = a * x ** b
+
+# get coeffs from model
+intercept <- tidy(fit) %>%
+            filter(term == "(Intercept)") %>%
+            pull(estimate)
+
+gradient <- tidy(fit) %>%
+            filter(term == "log(income_2018)") %>%
+            pull(estimate)
+
+# convert to a and b. Only a needs conversion in this model
+a <- exp(intercept)
+b <- gradient
+
+#fit transformation
+fitted <- fitted %>%
+          mutate(fitted_y_loglog = a * fit_x ** b) # insert a and b into untransformed equation
+
+# plot
+plot +
+  geom_line(data = fitted, aes(x = fit_x, y = fitted_y_loglog), col = "blue") 
+```
+
+```{r}
+library(HH)
+```
+# 
+```{r}
+ladder(life_2018 ~ income_2018, data = income_life)
+```
+
+```{r}
+library(bestNormalize)
+```
+
+```{r}
+bestNormalize(income_life$income_2018)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
