@@ -1,0 +1,245 @@
+---
+title: "Logistic regression lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(readxl)
+```
+```{r}
+telco_churn <- read_excel("data/telecomms_churn.xlsx")
+telco_churn <- clean_names(telco_churn)
+
+glimpse(telco_churn)
+```
+```{r}
+telco_churn <- telco_churn %>%
+  filter(!is.na(total_charges))
+```
+
+```{r}
+telco_churn <- telco_churn %>%
+  select(-customer_id)
+```
+
+```{r}
+split1 <- telco_churn %>%
+  select(gender, senior_citizen, partner, churn)
+
+split2 <- telco_churn %>%
+  select(dependents, tenure, phone_service, churn)
+
+split3 <- telco_churn %>%
+  select(internet_service, contract, monthly_charges, total_charges, churn)
+```
+```{r}
+library(GGally)
+```
+
+```{r message=FALSE}
+split1 %>%
+  ggpairs()
+
+split2 %>%
+  ggpairs()
+
+split3 %>%
+  ggpairs()
+```
+
+```{r}
+telco_churn_facs <- telco_churn %>%
+  mutate_if(is_character, as_factor) %>%
+  mutate(senior_citizen = as_factor(if_else(senior_citizen == 1, "Yes", "No")))
+```
+
+```{r}
+mod1_1pred_monthly_charges <- glm(churn ~ monthly_charges, data = telco_churn_facs, family = binomial(link = 'logit'))
+
+mod2_1pred_tenure <- glm(churn ~ tenure, data = telco_churn_facs, family = binomial(link = 'logit'))
+
+mod3_1pred_senior <- glm(churn ~ senior_citizen, data = telco_churn_facs, family = binomial(link = 'logit'))
+
+library(broom)
+
+clean_names(tidy(mod1_1pred_monthly_charges))
+clean_names(tidy(mod2_1pred_tenure))
+clean_names(tidy(mod3_1pred_senior))
+
+clean_names(glance(mod1_1pred_monthly_charges))
+clean_names(glance(mod2_1pred_tenure))
+clean_names(glance(mod3_1pred_senior))
+```
+
+```{r}
+library(pROC)
+library(modelr)
+
+telco_churn_facs_with_mod1 <- telco_churn_facs %>%
+  add_predictions(mod1_1pred_monthly_charges, type = "response")
+telco_churn_facs_with_mod2 <- telco_churn_facs %>%
+  add_predictions(mod2_1pred_tenure, type = "response")
+telco_churn_facs_with_mod3 <- telco_churn_facs %>%
+  add_predictions(mod3_1pred_senior, type = "response")
+
+roc_obj_mod1 <- telco_churn_facs_with_mod1 %>%
+  roc(response = churn, predictor = pred)
+roc_obj_mod2 <- telco_churn_facs_with_mod2 %>%
+  roc(response = churn, predictor = pred)
+roc_obj_mod3 <- telco_churn_facs_with_mod3 %>%
+  roc(response = churn, predictor = pred)
+
+roc_curve <- ggroc(
+  data = list(
+    mod1 = roc_obj_mod1, 
+    mod2 = roc_obj_mod2,
+    mod3 = roc_obj_mod3
+  ), 
+  legacy.axes = TRUE) +
+  coord_fixed()
+
+roc_curve
+```
+
+```{r}
+auc(roc_obj_mod1)
+auc(roc_obj_mod2)
+auc(roc_obj_mod3)
+```
+
+```{r}
+library(caret)
+```
+
+```{r}
+train_control <- trainControl(method = "repeatedcv", 
+                              number = 5,
+                              repeats = 100,
+                              savePredictions = TRUE, 
+                              classProbs = TRUE, 
+                              summaryFunction = twoClassSummary)
+```
+
+```{r}
+mod1_1pred_monthly_charges_cv <- train(mod1_1pred_monthly_charges$formula,
+                                       data = telco_churn_facs,
+                                       trControl = train_control,
+                                       method = "glm",
+                                       family = binomial(link = 'logit'))
+```
+
+```{r}
+mod2_1pred_tenure_cv <- train(mod2_1pred_tenure$formula,
+                              data = telco_churn_facs,
+                              trControl = train_control,
+                              method = "glm",
+                              family = binomial(link = 'logit'))
+```
+
+```{r}
+mod3_1pred_senior_cv <- train(mod3_1pred_senior$formula,
+                           data = telco_churn_facs,
+                           trControl = train_control,
+                           method = "glm",
+                           family = binomial(link = 'logit'))
+```
+
+```{r}
+mod1_1pred_monthly_charges_cv$results
+mod2_1pred_tenure_cv$results
+mod3_1pred_senior_cv$results
+```
+
+```{r}
+coeff <- clean_names(tidy(mod2_1pred_tenure)) %>%
+  filter(term == "tenure") %>%
+  select(estimate)
+coeff
+```
+
+```{r}
+odds_ratio <- exp(coeff * 1)
+odds_ratio
+```
+
+# Extensions.
+
+```{r}
+mod4_all_preds <- glm(churn ~ ., data = telco_churn_facs, family = binomial(link = 'logit'))
+clean_names(tidy(mod4_all_preds)) %>%
+  select(term, p_value) %>%
+  filter(p_value > 0.05)
+```
+
+```{r}
+telco_churn_facs_with_mod4 <- telco_churn_facs %>%
+  add_predictions(mod4_all_preds, type = "response")
+
+roc_obj_mod4 <- telco_churn_facs_with_mod4 %>%
+  roc(response = churn, predictor = pred)
+
+ggroc(roc_obj_mod4) +
+  coord_fixed()
+
+auc(roc_obj_mod4)
+```
+
+```{r}
+mod4_all_preds_cv <- train(churn ~ .,
+                           data = telco_churn_facs,
+                           trControl = train_control,
+                           method = "glm",
+                           family = binomial(link = 'logit'))
+```
+
+```{r}
+mod4_all_preds_cv$results
+```
+
+```{r}
+classifier_data <- tibble(
+  threshold = roc_obj_mod4$thresholds,
+  tpr = roc_obj_mod4$sensitivities,
+  tnr = roc_obj_mod4$specificities
+) %>%
+  mutate(
+    fpr = 1 - tnr,
+    fnr = 1 - tpr
+  )
+
+head(classifier_data)
+```
+
+```{r}
+prob_pos = sum(telco_churn_facs$churn == "Yes") / nrow(telco_churn_facs)
+prob_pos
+prob_neg = sum(telco_churn_facs$churn == "No") / nrow(telco_churn_facs)
+prob_neg
+```
+
+```{r}
+tpp <- as.numeric(telco_churn_facs %>%
+  filter(churn == "Yes") %>%
+  summarise(mean(total_charges) - 100))
+
+tnp <- 0
+fpp <- -100
+fnp <- 0
+
+classifier_data <- classifier_data %>%
+  mutate(
+    exp_profit = 
+      prob_pos * (tpr * tpp + fnr * fnp) + 
+      prob_neg * (tnr * tnp + fpr * fpp)
+  )
+
+classifier_data %>%
+  ggplot(aes(x = threshold, y = exp_profit)) +
+  geom_line()
+
+classifier_data %>%
+  filter(exp_profit == max(exp_profit))
+```
+

@@ -1,0 +1,91 @@
+---
+title: "decision_trees_lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+Get and prepare data
+
+```{r}
+avocado <- read_csv("data/avocado.csv") %>%
+  clean_names()
+
+head(avocado)
+```
+
+
+```{r}
+
+avocado <- avocado %>%
+  select(-c("x1","total_volume", "total_bags", "region", "year")) %>%
+  mutate(month = month(date, abbr = FALSE, label = TRUE)) %>%
+  mutate(type = as.factor(type)) %>%
+  select(-date)
+
+summary(avocado)
+
+```
+
+```{r}
+dim(avocado)
+```
+
+Make training and testing datasets
+
+```{r}
+n_data <- nrow(avocado)
+test_index <- sample(1:n_data, size = n_data*0.1)
+test_avocado <- slice(avocado, test_index)
+train_avocado <- slice(avocado, -test_index)
+```
+
+```{r}
+fit_avocado <- rpart(type ~ . , data = train_avocado, method = "class")
+fit_avocado
+```
+
+```{r}
+rpart.plot(fit_avocado, yesno = 2)
+```
+
+Attemp to predict if an organic avocado was sold.
+```{r}
+library(modelr)
+```
+
+```{r}
+avocado_predict <- test_avocado %>%
+  add_predictions(fit_avocado, type = "class")
+avocado_predict
+```
+```{r}
+avocado_matrix <- avocado_predict %>%
+  conf_mat(truth = type, estimate = pred)
+avocado_matrix
+```
+
+
+```{r}
+avocado_accuracy <- avocado_predict %>%
+  accuracy(truth = type, estimate = pred)
+avocado_accuracy
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
