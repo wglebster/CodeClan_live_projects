@@ -1,0 +1,283 @@
+---
+title: "Segmentation & Clustering"
+output: html_notebook
+---
+
+# Segmentation.
+
+It means manually segmenting our data into different parts, e.g. by age/income etc.
+
+# Clustering.
+
+Machine learning technique to cluster data based on similarities. 
+
+## Hierarchical Clustering (manual):
+
+defined by measuring the distance or correlation. 
+
+Distance measured Euclidian distance (like with a ruler), but because the points are defined on a plain, it is usually measured using Pythagoras theorem c = a^2 * b^2.
+
+If Euclidian distance is unsuitable, e.g. on maps in cities, "manhattan" distance can be used. 
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+```
+```{r}
+head(USArrests)
+```
+check for NAs.
+```{r}
+summary(USArrests)
+```
+
+!Need to scale the data! because the algorithm is based on distances.
+
+mean = 0, sd = 1
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+```{r}
+arrests <- USArrests %>%
+  clean_names() %>%
+  rownames_to_column("state") %>%
+  mutate_if(is.numeric, scale)
+```
+
+```{r}
+head(arrests)
+```
+
+```{r}
+summary(arrests)
+```
+
+Calculate Eucl distance for "murder" between the states.
+
+```{r}
+diss_matrix <- arrests %>%
+  column_to_rownames("state") %>%
+  select(murder) %>%
+  dist(method = "euclidean")
+```
+visualize the distance.
+```{r}
+fviz_dist(diss_matrix)
+```
+
+Complete method is the most widely used, but there are other distance calculation methods. 
+```{r}
+clusters <- diss_matrix %>%
+  hclust(method = "complete")
+```
+
+visualise
+```{r}
+#this is using base r, but GG dendrogram can be used to make it look nicer.
+clusters %>%
+  plot(cex = 0.6, hang = -2)
+```
+
+### Picking a number of clusters.
+
+Depending on business context, the number of clusters may be different from the optimal number of clusters. 
+
+For the above model, the optimal number of clusters is 3!
+
+```{r}
+plot(clusters, cex = 0.5, hang = -5)
+rect.hclust(clusters, k = 3, border = 2:4)
+```
+
+```{r}
+arrests_cluster_h3 <- arrests %>%
+  mutate(murder_cluster = cutree(clusters, 3))
+head(arrests_cluster_h3)
+```
+
+a wee task.
+
+```{r}
+diss_matrix_all_crime <- arrests %>%
+  column_to_rownames("state") %>%
+  select(murder, assault, rape, urban_pop) %>%
+  dist(method = "euclidean")
+```
+
+```{r}
+fviz_dist(diss_matrix_all_crime)
+```
+
+```{r}
+clusters_all_crime <- diss_matrix_all_crime %>%
+  hclust(method = "complete")
+```
+
+```{r}
+clusters_all_crime %>%
+plot(cex = 0.6, hang = -2)
+```
+
+
+```{r}
+plot(clusters_all_crime, cex = 0.5, hang = -5)
+rect.hclust(clusters_all_crime, k = 5, border = 2:4)
+```
+```{r}
+arrests_cluster_h4 <- arrests %>%
+  mutate(clusters_all_crime = cutree(clusters_all_crime, 3))
+head(arrests_cluster_h4)
+```
+
+## K-means clustering with centroids.
+
+```{r}
+k_arrests <- USArrests %>%
+  clean_names()%>%
+  select(c(murder, assault))
+head(k_arrests)
+```
+
+```{r}
+ggplot(k_arrests, aes(murder, assault)) +
+  geom_point()
+```
+
+scale the data, but not things like longitude/latitude.
+
+```{r}
+summary(k_arrests)
+```
+
+```{r}
+k_arrests_scaled <- k_arrests %>%
+  clean_names() %>%
+  mutate_if(is.numeric, scale)
+
+summary(k_arrests_scaled)
+```
+```{r}
+k_clustered_arrests <- kmeans(k_arrests_scaled, centers = 6, nstart = 25) 
+#nstart = 25 - defined number of iterations
+k_clustered_arrests
+```
+```{r}
+library(broom)
+```
+```{r}
+tidy_k_clustered_arrests <- tidy(k_clustered_arrests)
+tidy_k_clustered_arrests
+```
+
+```{r}
+glance(k_clustered_arrests)
+```
+```{r}
+augment(k_clustered_arrests, arrests)
+```
+
+```{r}
+library(animation)
+```
+```{r}
+k_arrests_scaled %>%
+  kmeans.ani(centers = 6)
+```
+
+```{r}
+glance(k_clustered_arrests)
+```
+withinss = within sum of squared
+
+### How to pick number of K?
+
+3 methods: could check all three and pick the most common K across three methods. 
+
+
+***elbow diagram***
+library(broom)
+```{r}
+max_k <- 20 #max K number
+
+k_clusters <- tibble(k = 1:max_k) %>%
+  mutate(
+    kclust = map(k, ~kmeans(k_arrests_scaled, .x, nstart = 25)),
+    tidied = map(kclust, tidy),
+    glanced = map(kclust, glance),
+    augmented = map(kclust, augment, arrests)
+  )
+k_clusters
+```
+
+```{r}
+clusterings <- k_clusters %>% 
+  unnest(glanced)
+clusterings
+```
+
+```{r}
+ggplot(clusterings, aes(x =k, y = tot.withinss))+
+  geom_point()+
+  geom_line()+
+  scale_x_continuous(breaks = seq(1,20, by = 1))
+```
+Could pick 2 or 3 clusters optimally.
+
+
+```{r}
+fviz_nbclust(k_arrests_scaled, kmeans, method = "wss", nstart = 25)
+```
+
+***Silhouette coefficient***
+
+S>0 - well clustered
+S=0 - close to boundary
+S>0 - not well clustered
+
+```{r}
+fviz_nbclust(k_arrests_scaled, kmeans, method = "silhouette", nstart = 25)
+```
+k = 2 is the best, k = 3 not too far off
+
+***gap statistic***
+
+looking to maximise gap statistic, which number of K gives us max gap stat.
+
+```{r}
+fviz_nbclust(k_arrests_scaled, kmeans, method = "gap_stat", nstart = 25, k.max = 10)
+```
+k = 2 according to gap stat.
+
+
+#### Visualise with K=2
+
+```{r}
+clusterings %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k <= 6) %>%
+ ggplot(aes(x = murder, y = assault)) +
+  geom_point(aes(color = .cluster)) + 
+  facet_wrap(~ k)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+clusterings %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k == 2) %>%
+ ggplot(aes(x = murder, y = assault, colour = .cluster, label = state)) +
+  geom_point(aes(color = .cluster)) +
+  geom_text(hjust = 0, vjust = - 0.5, size = 3)
+```
+```{r}
+unnest(clusterings, cols = augmented)
+```
+

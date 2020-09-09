@@ -1,0 +1,227 @@
+---
+title: "Goodness of fit of a logistic regression"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+mortgage_data <- read_csv("data/mortgage_applications.csv") %>%
+  clean_names()
+
+```
+
+```{r}
+mortgage_3pred_model <- glm(accepted ~ tu_score, age, employed, 
+                                  data = mortgage_data, family = binomial(link = "logit"))
+```
+
+
+```{r}
+mortgage_data_with_3pred <- mortgage_data %>%
+  add_predictions(mortgage_3pred_model, type = "response")
+
+head(mortgage_data_with_3pred)
+```
+
+Where is the prediction likely to be TRUE?
+
+```{r}
+#set threshold
+
+threshold <- 0.6
+
+mortgage_data_with_3pred <- mortgage_data_with_3pred %>%
+  mutate(pred_threshold_0.6 = pred >= threshold)
+
+mortgage_data_with_3pred
+
+```
+
+### Confusion matrix
+
+To establish how often our predicted outcome is correct.
+
+```{r}
+mortgage_data_with_3pred %>%
+  tabyl(accepted, pred_threshold_0.6)
+
+# 182 true positives
+# 
+```
+Confusion matrix - predictions are read left to right (pred -> )
+
+
+Cases we trying to find are P - interesting, in our case accepted = TRUE
+```{r}
+#this is a true positive
+mortgage_data_with_3pred %>%
+  filter(tu_score == 631)
+```
+```{r}
+#this one has F / T - 2 False positives & T / T - true positives
+mortgage_data_with_3pred %>%
+  filter(tu_score == 594)
+```
+
+
+***accuracy***
+
+Is how ofted does the model get it right: (numTruePositives + numTrueNegatives) / total cases
+
+```{r}
+NTP <- 179
+NTN <- 679
+NFP <- 49
+NFN <- 93
+N <- 1000
+
+accuracy <- (NTP + NTN) / N
+accuracy
+```
+This model is 85.8% accurate, but not good if working with unbalanced data. 
+
+***rates***
+
+TPR - true positives rate. TPR = NTP /(NTP + NFP)
+
+TNR - true negative rate . TNR = NTN / (NTN + NFP)
+
+FPR - false positive rate. FPR = NFP / (NFP + NTN)
+
+FNR - false negative rate. FNR <- NFN / (NFN + NTP)
+
+```{r}
+TPR <- NTP / (NTP + NFN)
+TPR
+TNR <- NTN / (NTN + NFP)
+TNR
+FPR <- NFP / (NFP+ NTN)
+FPR
+FNR <- NFN / (NFN + NTP)
+FNR
+```
+
+***ROC curve***
+"Receiver Operating Charachteristic" curve. 
+
+```{r}
+library(pROC)
+```
+
+Create an ROC object
+
+```{r}
+roc_3pred <- mortgage_data_with_3pred %>%
+  roc(response = accepted, predictor = pred)
+```
+
+Plot the ROC curve
+
+```{r}
+roc_curve <- ggroc(data = roc_3pred, legacy.axes = TRUE) +
+  coord_fixed()
+roc_curve
+```
+
+Y- axis: TPR; X- axis: FPR
+
+
+
+```{r}
+mortgage_1pred_model <- glm(accepted ~ age, data = mortgage_data, family = binomial(link = "logit"))
+```
+
+
+```{r}
+mortgage_data_with_1pred <- mortgage_data %>%
+  add_predictions(mortgage_1pred_model, type = "response")
+
+head(mortgage_data_with_1pred)
+```
+```{r}
+roc_1pred <- mortgage_data_with_1pred %>%
+  roc(response = accepted, predictor = pred)
+
+roc_curve <- ggroc(data =list("1p" = roc_1pred, "3p" = roc_3pred), legacy.axes = TRUE) +
+  coord_fixed()
+roc_curve
+```
+
+***Area under the curve (AUC)***
+ The higher AUC the better the classifier.
+ 
+```{r}
+auc(roc_3pred)
+```
+```{r}
+auc(roc_1pred)
+```
+
+# Check cross validation.
+
+
+***Expected value, cost/benefit analysis and optimal threshold***
+
+```{r}
+classifier_data <- tibble(
+  threshold = roc_3pred$thresholds,
+  tpr = roc_3pred$sensitivities,
+  tnr = roc_3pred$specificities
+) %>%
+  mutate(
+    fpr = 1-tnr,
+    fnr = 1 - tpr
+  )
+
+head(classifier_data)
+```
+```{r}
+prob_pos <- sum(mortgage_data$accepted) / 1000 #1000 rows
+prob_pos
+
+prob_neg = sum(!mortgage_data$accepted) / 1000
+prob_neg
+```
+
+```{r}
+tpp <- 20
+tnp <- 0
+fpp <- -5
+fnp <- 0
+
+#now create expected profit 
+
+classifier_data <- classifier_data %>%
+  mutate(
+    exp_profit_per_pot_app = prob_pos * (tpr*tpp + fnr * fnp) + 
+      prob_neg * (tnr*tnp*fpr*fpp)
+  )
+
+classifier_data %>%
+  ggplot(aes(x = threshold, y = exp_profit_per_pot_app)) +
+  geom_line()
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

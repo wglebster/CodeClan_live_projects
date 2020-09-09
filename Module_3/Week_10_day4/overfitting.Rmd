@@ -174,7 +174,7 @@ median(abs(predict_well - test_well$savings))
 
 (harnesses both pasimonious and test/train benefits)
 
-usually select 10-folks.
+usually select 10-folds.
 
 disadvantage: slow to run
 

@@ -1,0 +1,175 @@
+---
+title: "Logistic Regression (for classification) part1"
+output: html_notebook
+---
+
+This is a supervised learning techinque.
+Regression has a continuous outcomes.
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+```{r}
+mortgage_data <- read_csv("data/mortgage_applications.csv") %>%
+  clean_names()
+
+mortgage_data
+```
+```{r}
+library(GGally)
+```
+```{r}
+ggpairs(mortgage_data, progress = FALSE)
+```
+
+how does acceptance vary with tu score (credit score)
+
+```{r}
+score_plot <- ggplot(mortgage_data)+
+  geom_jitter(aes(x = tu_score, y = as.integer(accepted)), shape = 1, 
+              position = position_jitter(height = 0.03))
+
+score_plot
+```
+
+Higher tu_score results in higher chances of mortgage application acceptance. 
+
+This is possible to model with LM.
+```{r}
+mortgage_data_lin_model <- lm(as.integer(accepted)~tu_score, data = mortgage_data)
+mortgage_data_lin_model
+```
+
+```{r}
+library(modelr)
+```
+```{r}
+predict_lin <- tibble(tu_score = seq(0,710,1)) %>%
+  add_predictions(mortgage_data_lin_model)
+predict_lin
+```
+
+```{r}
+score_plot +
+  geom_line(data = predict_lin, aes(x = tu_score, y = pred), col = "red")
+```
+
+This is not a good model. Probability should not be less than 0!
+
+
+#### Logistic function.
+
+Generalised linear model: glm() - after transformation of y we end up with a line.
+
+there are different glm()s, but we are interested in logistic regression.
+
+```{r}
+mortgage_data_logreg_model <- glm(accepted ~ tu_score, 
+                                  data = mortgage_data, family = binomial(link = "logit"))
+
+mortgage_data_logreg_model
+```
+
+```{r}
+predict_log <- tibble(tu_score = seq(0,710,1)) %>%
+  add_predictions(mortgage_data_logreg_model, type = "response")
+
+score_plot +
+  geom_line(data = predict_log, aes(x = tu_score, y = pred, col = "red"))
+```
+
+tu_score of 594.
+
+```{r}
+mortgage_data %>%
+  filter(tu_score == 594)
+```
+
+Probability of being accepted is 3/(2+3) = 3/5 = 6/10 = 0.6
+
+```{r}
+predict_at <- tibble(tu_score = 594) %>%
+  add_predictions(mortgage_data_logreg_model, type = "response")
+predict_at
+```
+
+Interpreting coefficient in logistic regression: 
+
+(Odds of success after change in x) = exp(b * change in x) * (odds of success before change in x)
+
+```{r}
+predict_at_594 <- tibble(tu_score = 594) %>%
+  add_predictions(mortgage_data_logreg_model, type = "response") %>%
+  mutate(odds = pred / (1-pred))
+predict_at_594
+```
+
+```{r}
+mortgage_data_logreg_model
+```
+
+```{r}
+b <- 0.008475 # b is "slope"
+```
+
+odds of success after change of tu_score = exp(0.008475 * change in tu_score) * (odds of success before change in tu_score)
+
+exp(0.008475 * change in tu_score): odds factor
+
+(odds of success before change in tu_score) : odds at 594
+
+change in tu_score = +50
+
+```{r}
+odds_factor <- exp(b*50)
+odds_factor
+```
+
+```{r}
+odds_at_644 <- odds_factor * predict_at_594
+
+odds_at_644
+```
+ for Every 2.4 applications, 1 is rejected
+ 
+###### task
+
+How do odds change if tu_score descreased by 50.
+
+```{r}
+task_odds_factor <- (exp(b * (-50)))
+odds_at_544 <- task_odds_factor * predict_at_594
+task_odds_factor
+odds_at_544
+```
+
+about 50/50 chances of being accepted.
+
+
+## multiple predictors.
+
+```{r}
+mortgage_data_multi_logreg_model <- glm(accepted ~ tu_score + employed + age, data = mortgage_data,
+                           family = binomial(link = "logit"))
+mortgage_data_multi_logreg_model
+```
+
+```{r}
+library(broom)
+```
+```{r}
+tidy_out <- clean_names(tidy(mortgage_data_multi_logreg_model))
+glance_out <- clean_names(glance(mortgage_data_multi_logreg_model))
+tidy_out
+glance_out
+```
+
+
+
+
+
+
+
+
+
