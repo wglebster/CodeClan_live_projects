@@ -1,0 +1,49 @@
+---
+title: "Text analysis Lab"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(tidytext)
+library(ggwordcloud)
+library(hcandersenr)
+library(harrypotter)
+library(janeaustenr)
+
+library(text2vec)
+```
+
+```{r}
+little_mermaid <- hcandersen_en %>%
+  filter(book == "The little mermaid") %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  anti_join(stop_words)
+
+
+  ggwordcloud(words = little_mermaid$word, 
+              freq = little_mermaid$n, 
+              random.color = TRUE,
+              colors = c("red", "green", "blue"),
+              random.order = TRUE,
+            )
+```
+
+
+```{r}
+library(ggplot2)
+
+little_mermaid %>%
+  inner_join(get_sentiments("afinn")) %>%
+  top_n(10, wt = n) %>%
+  arrange(desc(n)) %>%
+  slice(1:10) %>%
+ggplot(aes(reorder(x = word, -n), y = n, fill = value)) +
+  geom_histogram(stat = "identity")
+```
+
+
+
+

@@ -1,0 +1,231 @@
+---
+title: "Text Datamining"
+output: html_notebook
+---
+
+```{r}
+library(tidytext)
+library(dplyr)
+```
+
+```{r}
+phrases <- c(
+  "here is some text",
+  "more text",
+  "text is text"
+)
+```
+
+```{r}
+example_text <- tibble(phrase = phrases,
+                       id = 1:3)
+example_text
+```
+
+
+```{r}
+words_df <- example_text %>%
+  unnest_tokens(word, phrase, to_lower = FALSE)
+```
+```{r}
+words_df %>%
+  arrange(word)
+```
+
+```{r}
+words_df %>%
+  group_by(word) %>%
+  summarise(count = n())
+```
+
+```{r}
+words_df %>%
+  group_by(word, id) %>%
+  summarise(count = n())
+```
+
+```{r}
+lines <- 
+c(
+  "Whose woods these are I think I know.",
+  "His house is in the village though;", 
+  "He will not see me stopping here",
+  "To watch his woods fill up with snow."
+)
+```
+
+```{r}
+poem_df <- tibble(phrase = lines,
+                  id = 1:4)
+poem_df
+```
+
+```{r}
+poem_df %>%
+  unnest_tokens(word, phrase) %>%
+  count(word) %>%
+  filter(n > 1)
+```
+```{r}
+library(janeaustenr)
+```
+
+```{r}
+str(prideprejudice)
+```
+
+find most common words
+
+```{r}
+book <- tibble(text = prideprejudice,
+                            sentence_no = 1: length(prideprejudice)
+                            ) %>%
+  unnest_tokens(word, text)
+```
+```{r}
+book %>%
+  count(word, sort = TRUE) %>%
+  anti_join(stop_words)
+```
+
+```{r}
+stop_words %>%
+  count(lexicon)
+```
+```{r}
+book2 <- tibble(text = sensesensibility) %>%
+  unnest_tokens(word, text)
+
+book2 %>%
+  count(word, sort = TRUE) %>%
+  anti_join(filter(stop_words, lexicon == "snowball"))
+```
+
+# Turning words into data (TF-IDF & n_grams)
+
+```{r}
+library(tidyr)
+```
+
+```{r}
+sentences <- c(
+  "This is a sentence about cats.",
+  "This is a sentence about dogs.",
+  "This is a sentence about alligators."
+)
+```
+
+```{r}
+sentences_df <- tibble(sentence = sentences, id = 1:3) %>%
+  unnest_tokens(word, sentence)
+
+sentences_df %>%
+  count(word, id)
+```
+
+TF-IDF - Term Frequency / Inverse Document Frequency
+
+Term Frequency - how often each word appears in a document divided by total number of terms in the document.
+
+Document Frequency - number of documents term appears in divided by number of documents. 
+
+TF-IDF = TF * (1/DF)
+
+```{r}
+all_books_tf_idf <- 
+austen_books() %>%
+  unnest_tokens(word, text) %>%
+  count(word, book, sort = TRUE) %>%
+  bind_tf_idf(word, book, n)
+```
+
+```{r}
+all_books_tf_idf %>%
+  arrange(desc(tf_idf))
+```
+```{r}
+all_books_tf_idf %>%
+  group_by(book) %>%
+  filter(tf_idf == max(tf_idf))
+```
+
+```{r}
+all_books_tf_idf %>%
+  group_by(book) %>%
+  top_n(5, wt = tf_idf) %>%
+  arrange(book, desc(tf_idf))
+```
+
+## N_grams (combinations of consecutive words)
+
+```{r}
+phrases_df <- tibble(phrase = phrases)
+
+phrases_df %>%
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 2)
+```
+
+```{r}
+prideprejudice_bigrams <- tibble(phrase = prideprejudice)
+
+prideprejudice_bigrams %>%
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 3 ) %>%
+  count(bigram, sort = TRUE)
+```
+
+
+
+
+# Sentiment analysis.
+
+```{r}
+get_sentiments("afinn")
+```
+```{r}
+get_sentiments("bing")
+```
+```{r}
+get_sentiments("loughran") %>%
+  count(sentiment, sort = TRUE)
+```
+
+```{r}
+book <- tibble(text = prideprejudice, sentence = 1:length(prideprejudice)) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+```
+```{r}
+# some sentiment analysis code here.
+```
+
+
+```{r}
+book_sentiments <- book %>%
+  inner_join(get_sentiments("afinn"))
+```
+
+```{r}
+sentence_sentiments <- book_sentiments %>%
+  group_by(sentence) %>%
+  summarise(avg_sentiment = mean(value))
+```
+```{r}
+library(ggplot2)
+```
+```{r}
+ggplot(sentence_sentiments) +
+  aes(x = sentence, y = avg_sentiment) +
+  geom_smooth(se = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
