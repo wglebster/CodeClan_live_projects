@@ -1,0 +1,499 @@
+---
+title: "Spark"
+output: html_notebook
+---
+
+# Setting up
+
+```{r}
+library(sparklyr)
+```
+```{r}
+spark_installed_versions()
+```
+
+Create spark connection:
+```{r}
+sc <- spark_connect(master = "local", version = "2.4.5")
+```
+```{r}
+sc
+```
+```{r}
+library(tidyverse)
+```
+```{r}
+library(janitor)
+avocado <- read_csv("avocado.csv") %>%
+  clean_names()
+```
+
+```{r}
+avocado_spark <- copy_to(sc, avocado)
+```
+
+```{r}
+avocado_spark <- spark_read_csv(sc, path = "avocado.csv")
+```
+
+```{r}
+avocado_spark<- tbl(sc, "avocado")
+```
+
+```{r}
+src_tbls(sc)
+```
+
+```{r}
+class(avocado_spark)
+```
+
+```{r}
+str(avocado_spark)
+```
+
+```{r}
+library(pryr)
+```
+
+```{r}
+object_size(avocado)
+```
+```{r}
+object_size(avocado_spark)
+```
+```{r}
+selected_avocado_spark <- avocado_spark %>%
+  select(AveragePrice) %>%
+  summarise(av_mean = mean(AveragePrice)) %>%
+  collect() # collect on its own without summarizing is not a good idea, as there could
+#be too much data
+  
+  
+#object_size(selected_avocado_spark)
+```
+```{r}
+avocado_wo_price <- avocado_spark %>%
+  select(-AveragePrice) %>%
+  compute("avocado_wo_price")
+```
+
+```{r}
+avocado_spark %>%
+  select(AveragePrice) %>%
+  show_query()
+```
+
+```{r}
+avocado_spark <- avocado_spark %>%
+  mutate(high_average = AveragePrice > 1.40) %>%
+  show_query()
+```
+
+```{r}
+avocado_spark %>%
+  select(high_average) %>%
+  glimpse() %>%
+  show_query()
+```
+
+```{r}
+result <- avocado_spark %>%
+  mutate(low_average = AveragePrice < 1.0) %>%
+  show_query()
+
+collected_result <- result %>%
+  collect()
+
+class(result)
+class(collected_result)
+```
+
+Spark web interface
+```{r}
+spark_web(sc)
+```
+
+
+# Analysis in Spark
+
+```{r}
+library(sparklyr)
+sc <- spark_connect(master = "local", version = "2.4.5")
+```
+
+```{r}
+library(dbplot)
+library(car)
+```
+
+```{r}
+prestige <- copy_to(sc, Prestige)
+```
+
+```{r}
+prestige %>%
+  summarise_if(is.numeric, mean) %>%
+  show_query()
+```
+
+```{r}
+prestige %>%
+  summarise_if(is.numeric, var) %>%
+  show_query()
+```
+
+```{r}
+prestige %>%
+  mutate(secondary_educated = ifelse(education > 7, "Yes", "No")) %>%
+  group_by(secondary_educated) %>%
+  summarise(mean_income = mean(income)) %>%
+  show_query()
+```
+
+```{r}
+prestige %>%
+  select(income, education) %>%
+  glimpse()
+```
+
+```{r}
+tryCatch(
+  {prestige[, c("education", "income")] %>% glimpse()}, 
+  error = print
+)
+```
+
+```{r}
+tryCatch(
+  {Prestige[, c("education", "income")] %>% glimpse()}, 
+  error = print
+)
+```
+
+Passthrogh
+
+```{r}
+prestige %>%
+  summarise(women_percentile = percentile(women, array(0.25, 0.5, 0.75))) %>%
+  mutate(women_percentile = explode(women_percentile)) %>%
+  show_query()
+```
+
+# Visualisation
+
+```{r}
+prestige %>%
+  group_by(type) %>%
+  summarise(number = n()) %>%
+  collect() %>%
+  ggplot(aes(x = type, y = number)) +
+  geom_col(fill = "steelblue", alpha = 0.7)
+```
+
+Raster Plot
+```{r}
+library(dbplot)
+
+prestige %>%
+  dbplot_raster(x = education, y = income, resolution = 20)
+```
+
+# Sparklyr native interface
+
+```{r}
+schema <- sdf_schema(prestige)
+schema
+```
+
+# Native functions
+
+SDF
+sdf_... functions - Spark DataFrame
+
+Sorting
+
+```{r}
+prestige %>%
+  sdf_sort(columns = "prestige") %>%
+  head(20)
+```
+
+Sampling
+
+```{r}
+downsampled_prestige <- prestige %>%
+  sdf_sample(fraction = 0.2, replacement = FALSE, seed = 42) %>%
+  compute("downsampled_prestige")
+```
+
+Partitioning (e.g. train/test split)
+
+```{r}
+partitioned <- prestige %>%
+  sdf_random_split(training = 0.7, testing = 0.3)
+
+training <- partitioned$training %>%
+  compute("training")
+testing <- partitioned$testing %>%
+  compute("testing")
+```
+```{r}
+prestige %>%
+  count()
+```
+```{r}
+training %>%
+  count()
+```
+```{r}
+testing %>%
+  count()
+```
+
+Binding
+
+```{r}
+reassembled <-training %>%
+  sdf_bind_rows(testing)
+```
+
+```{r}
+reassembled %>%
+  count()
+```
+
+```{r}
+ls("package:sparklyr", pattern = "^ft" )
+```
+
+
+MLlib
+ft_... - Feature Transformers
+ml_... - Machine Learning
+
+# Parquet format data
+
+```{r}
+spark_write_parquet(prestige, "prestige_data")
+```
+
+```{r}
+prestige_again <- spark_read_parquet(sc, name = "prestige_again", path = "prestige_data") %>%
+  glimpse()
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+profiles <- spark_read_csv(sc, "profiles.csv", 
+                           escape = "\"", 
+                           memory = FALSE,
+                           options = list(multiline = TRUE))
+```
+
+```{r}
+glimpse(profiles)
+```
+
+```{r}
+profiles %>%
+  summarise_all(.funs = ~sum(as.integer(is.na(.))))
+```
+
+
+```{r}
+profiles %>%
+  count()
+```
+```{r}
+profiles %>%
+  summarise(num_neg_income = sum(as.integer(income < 0 )))
+```
+
+```{r}
+profiles_char <- profiles %>%
+  select(-c(age, income, height)) %>%
+  mutate_all(~ ifelse(is.na(.), "missing", .))
+```
+
+```{r}
+profiles_num <- profiles %>%
+  select(age, income, height) %>%
+  mutate(
+    age = as.numeric(age),
+    income = ifelse(income == "-1", NA, as.numeric(income)),
+    height = as.numeric(height)
+  )
+```
+
+```{r}
+profiles <- sdf_bind_cols(profiles_char, profiles_num) %>%
+  compute("profiles")
+```
+
+```{r}
+profiles %>%
+  summarise_all( ~sum(as.integer(is.na(.))))
+  glimpse()
+```
+
+```{r}
+schema <- sdf_schema(profiles)
+
+schema %>%
+  transpose() %>%
+  as_tibble() %>%
+  unnest(cols = c(name, type))
+```
+
+```{r}
+contingency <- profiles %>%
+  sdf_crosstab("drinks", "drugs") %>%
+  collect()
+
+contingency %>%
+  rename(drinks = drinks_drugs) %>%
+  mutate(
+    drinks = as_factor(drinks) %>%
+      fct_relevel("missing", "not at all", "rarely", "socially", "often", "very often", "desperately")
+  ) %>%
+  arrange(drinks) %>%
+  select(drinks, missing, never, sometimes, often)
+```
+
+
+Machine Learning model
+
+```{r}
+profiles <- profiles %>%
+  mutate(
+    not_working = as.integer(ifelse(job %in% c("student", "unemployed", "retured"),1,0))
+    )
+
+profiles %>%
+  count(not_working)
+```
+
+```{r}
+sdf_describe(profiles, cols = c("age", "height", "income", "not_working"))
+```
+
+# Feature engineering
+
+Categorical encoding
+ft_string_indexer()
+ft_one_hot_encoder() to make dummies
+
+```{r}
+profiles <- profiles %>%
+  ft_string_indexer(
+    input_col = "drinks",
+    output_col = "drinks_indexed"
+  ) %>%
+  ft_one_hot_encoder(
+    input_col = "drinks_indexed",
+    output_col = "drinks_encoded"
+  ) %>%
+  ft_string_indexer(
+    input_col = "drugs",
+    output_col = "drugs_indexed"
+  ) %>%
+  ft_one_hot_encoder(
+    input_col = "drugs_indexed",
+    output_col = "drugs_encoded"
+  ) %>%
+  ft_string_indexer(
+    input_col = "status",
+    output_col = "status_indexed"
+  ) %>%
+  ft_one_hot_encoder(
+    input_col = "status_indexed",
+    output_col = "status_encoded"
+  ) %>%
+  compute("profiles")
+```
+
+```{r}
+glimpse(profiles)
+```
+
+Train Test splitting
+
+```{r}
+partitioned <- profiles %>%
+  sdf_random_split(training = 0.7, testing = 0.3, seed = 42)
+
+training <- partitioned$training %>%
+  compute("training")
+
+testing <- partitioned$testing %>%
+  compute("testing")
+```
+
+# manual scaling
+
+scale Age
+
+Age - mean, sd
+
+```{r}
+scaling_values <- training %>%
+  summarise(
+    mean_age = mean(age),
+    sd_age  = sd(age)
+  ) %>%
+  collect()
+scaling_values
+```
+
+```{r}
+training <- training %>%
+  mutate(
+    scaled_age = (age - !!scaling_values$mean_age) / !!scaling_values$sd_age
+  ) %>%
+  glimpse()
+```
+
+Model: not_working ~ scaled_age, drinks, drugs, status
+
+```{r}
+training <- training %>%
+  ft_vector_assembler(
+    input_cols = c("scaled_age", "drinks_encoded", "drugs_encoded", "status_encoded"),
+    output_col = "features"
+  )
+```
+
+```{r}
+training %>%
+  collect()
+```
+
+```{r}
+logreg_model <- training %>%
+  ml_logistic_regression(
+    label_col = "not_working",
+    features_col = "features"
+  )
+```
+```{r}
+validation_info <- ml_evaluate(logreg_model, training)
+validation_info
+```
+
+```{r}
+roc <- validation_info$roc() %>%
+  collect() %>%
+  glimpse()
+```
+
+```{r}
+ggplot(roc, aes(x = FPR, y = TPR)) +
+  geom_line() +
+  geom_abline(lty = "dashed") +
+  coord_fixed()
+```
+
